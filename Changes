@@ -1,0 +1,6 @@
+Revision history for Perl extension Encode-JISX0213.
+
+0.01  Mon Sep  2 17:57:17 2013
+	- original version; created by h2xs 1.23 with options
+		-b 5.7.3 -AX -n Encode-JISX0213
+
