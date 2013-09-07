@@ -49,7 +49,7 @@ for my $d (@INC) {
 print "encode.h is at $encode_h\n";
 
 # get XS version.
-open my $pm_file, 'lib/Encode/ISO2022/CCS/JISX0213.pm';
+open my $pm_file, 'lib/Encode/JISX0213/CCS.pm';
 my $xs_version = eval [grep {s/^our \$VERSION\s*=\s//} <$pm_file>]->[0];
 close $pm_file;
 

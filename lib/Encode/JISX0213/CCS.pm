@@ -1,4 +1,4 @@
-package Encode::ISO2022::CCS::JISX0213;
+package Encode::JISX0213::CCS;
 
 use strict;
 use warnings;
@@ -53,7 +53,7 @@ __END__
 
 =head1 NAME
 
-Encode::ISO2022::CCS::JISX0213 - JIS X 0213 coded character sets
+Encode::JISX0213::CCS - JIS X 0213 coded character sets
 
 =head1 ABSTRACT
 
@@ -69,8 +69,8 @@ Encode::ISO2022::CCS::JISX0213 - JIS X 0213 coded character sets
        jisx0213-plane1-jis
   229  jisx0213-plane2       JIS X 0213:2000/2004 level 4 (plane 2)
   ----------------------------------------------------------------
-  * Ones prefixed "-ascii" and "-jis" use alternative names for the
-    characters compatible to ISO646 IRV and JIS X 0201 Latin set,
+  * Those prefixed "-ascii" and "-jis" use alternative names for the
+    characters compatible to ISO/IEC 646 IRV and JIS X 0201 Latin set,
     respectively.
 
 =head1 DESCRIPTION

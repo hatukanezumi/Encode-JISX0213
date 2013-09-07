@@ -1,6 +1,6 @@
 Changes
-lib/Encode/ISO2022/CCS/JISX0213.pm
 lib/Encode/JISX0213.pm
+lib/Encode/JISX0213/CCS.pm
 Makefile.PL
 MANIFEST			This list of files
 README
