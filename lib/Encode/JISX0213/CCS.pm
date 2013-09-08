@@ -19,7 +19,7 @@ foreach my $encoding (qw/jisx0213-plane1 jisx0213-2000-plane1/) {
 }
 
 sub encode {
-    my ($self, $utf8) = @_;
+    my ($self, $utf8, $chk) = @_;
 
     my $residue = '';
     if ($self->{alt} eq 'ascii') {
@@ -31,21 +31,24 @@ sub encode {
 	    $residue = $1;
 	}
     }
-    my $conv = $self->{encoding}->encode($utf8, 1);
+    my $conv = $self->{encoding}->encode($utf8, $chk);
 
     $_[1] = $utf8 . $residue;
     return $conv;
 }
 
 sub decode {
-    my ($self, $str) = @_;
+    my ($self, $str, $chk) = @_;
 
-    my $conv = $self->{encoding}->decode($str, 1);
+    my $conv = $self->{encoding}->decode($str, $chk);
     if ($self->{alt} eq 'ascii') {
 	$conv =~ tr/\x21-\x7E/\x{FF01}-\x{FF5E}/;
     } elsif ($self->{alt} eq 'jis') {
 	$conv =~ tr/\x21-\x5B\x{00A5}\x5D-\x7D\x{203E}/\x{FF01}-\x{FF3B}\x{FFE5}\x{FF3D}-\x{FF5D}\x{FFE3}/;
     }
+
+    $_[1] = $str;
+    return $conv;
 }
 
 1;

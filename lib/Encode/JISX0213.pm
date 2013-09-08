@@ -2,8 +2,9 @@ package Encode::JISX0213;
 
 use strict;
 use warnings;
-use base qw(Encode::ISO2022);
-our $VERSION = '0.01';
+use Encode::ISO2022;
+our @ISA = qw/Encode::ISO2022/;
+our $VERSION = '0.0_02';
 
 use Encode::JISLegacy;
 use Encode::JISX0213::CCS;
@@ -93,33 +94,24 @@ $Encode::Encoding{'iso-2022-jp-2004'} = bless {
     'CCS' => [
 	{
 	    desig_init => 1,
-	    desig_seq => "\e\x28\x42",
-	    desig_to => 'g0',
+	    designates("\e\x28\x42" => 'g0'),
 	    encoding => $Encode::Encoding{'ascii'},
 	},
 	{
-	    desig_seq => "\e\x24\x28\x51",
-	    desig_to => 'g0',
+	    designates("\e\x24\x28\x51" => 'g0', 2),
 	    encoding => $Encode::Encoding{'jisx0213-plane1-ascii'},
-	    bytes => 2,
 	},
 	{
-	    bytes => 2,
-	    desig_seq => "\e\x24\x28\x50",
-	    desig_to => 'g0',
+	    designates("\e\x24\x28\x50" => 'g0', 2),
 	    encoding => $Encode::Encoding{'jisx0213-plane2'},
 	},
 	# Unrecommended encodings.
 	{
-	    bytes => 2,
-	    desig_seq => "\e\x24\x28\x4F",
-	    desig_to => 'g0',
+	    designates("\e\x24\x28\x4F" => 'g0', 2),
 	    encoding => $Encode::Encoding{'jisx0213-2000-plane1-ascii'},
 	},
 	{
-	    bytes => 2,
-	    desig_seq => "\e\x24\x42",
-	    desig_to => 'g0',
+	    designates("\e\x24\x42" => 'g0', 2),
 	    encoding => $Encode::Encoding{'jis0208-raw'},
 	},
 	# Nonstandard
@@ -132,28 +124,21 @@ Encode::define_alias(qr/\biso-?2022-?jp-?3$/i => '"iso-2022-jp-3"');
 $Encode::Encoding{'iso-2022-jp-3'} = bless {
     'CCS' => [
 	{
-	    desig_init => 1;
-	    desig_seq => "\e\x28\x42",
-	    desig_to => 'g0',
+	    desig_init => 1,
+	    designates("\e\x28\x42" => 'g0'),
 	    encoding => $Encode::Encoding{'ascii'},
 	},
 	{
-	    bytes => 2,
-	    desig_seq => "\e\x24\x28\x4F",
-	    desig_to => 'g0',
+	    designates("\e\x24\x28\x4F" => 'g0', 2),
 	    encoding => $Encode::Encoding{'jisx0213-2000-plane1-ascii'},
 	},
 	{
-	    bytes => 2,
-	    desig_seq => "\e\x24\x28\x50",
-	    desig_to => 'g0',
+	    designates("\e\x24\x28\x50" => 'g0', 2),
 	    encoding => $Encode::Encoding{'jisx0213-plane2'},
 	},
 	# Unrecommended encoding.
 	{
-	    bytes => 2,
-	    desig_seq => "\e\x24\x42",
-	    desig_to => 'g0',
+	    designates("\e\x24\x42" => 'g0', 2),
 	    encoding => $Encode::Encoding{'jis0208-raw'},
 	},
 	# Nonstandard
