@@ -72,13 +72,15 @@ Encode::JISX0213::CCS - JIS X 0213 coded character sets
        jisx0213-plane1-jis
   229  jisx0213-plane2       JIS X 0213:2000/2004 level 4 (plane 2)
   ----------------------------------------------------------------
-  * Those prefixed "-ascii" and "-jis" use alternative names for the
-    characters compatible to ISO/IEC 646 IRV and JIS X 0201 Latin set,
-    respectively.
 
 =head1 DESCRIPTION
 
 FIXME FIXME
+
+=head2 Note on Variants
+
+Those prefixed "-ascii" and "-jis" use alternative names for the characters
+compatible to ISO/IEC 646 IRV and JIS X 0201 Latin set, respectively.
 
 =head1 SEE ALSO
 
