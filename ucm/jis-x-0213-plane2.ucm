@@ -10,9 +10,9 @@
 # * 2-93-27 have a fallback mapping from U+9B1D which was allocated by
 #   JIS X 0213:2000.
 #
-<code_set_name>  "jisx0213-plane2"
-<mb_cur_min> 1
-<mb_cur_max> 1
+<code_set_name>  "jis-x-0213-plane2"
+<mb_cur_min> 2
+<mb_cur_max> 2
 <subchar> \x3F
 #
 CHARMAP

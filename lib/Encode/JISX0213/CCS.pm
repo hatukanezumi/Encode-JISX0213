@@ -8,7 +8,7 @@ our $VERSION = '0.01';
 use XSLoader;
 XSLoader::load('Encode::JISX0213', $VERSION);
 
-foreach my $encoding (qw/jisx0213-plane1 jisx0213-2000-plane1/) {
+foreach my $encoding (qw/jis-x-0213-plane1 jis-x-0213-plane1-2000/) {
     foreach my $alt (qw/ascii jis/) {
 	$Encode::Encoding{"$encoding-$alt"} = bless {
 	    Name => "$encoding-$alt",
@@ -62,15 +62,15 @@ Encode::JISX0213::CCS - JIS X 0213 coded character sets
 
   This module provides followng coded character sets.
 
-  reg# Name                  Description
+  reg# Name                    Description
   ----------------------------------------------------------------
-  228  jisx0213-2000-plane1  JIS X 0213:2000 level 3 (plane 1)
-       jisx0213-2000-plane1-ascii
-       jisx0213-2000-plane1-jis
-  233  jisx0213-plane1       JIS X 0213:2004 level 3 (plane 1)
-       jisx0213-plane1-ascii
-       jisx0213-plane1-jis
-  229  jisx0213-plane2       JIS X 0213:2000/2004 level 4 (plane 2)
+  228  jis-x-0213-plane1-2000  JIS X 0213:2000 level 3 (plane 1)
+       jis-x-0213-plane1-2000-ascii
+       jis-x-0213-plane1-2000-jis
+  233  jis-x-0213-plane1       JIS X 0213:2004 level 3 (plane 1)
+       jis-x-0213-plane1-ascii
+       jis-x-0213-plane1-jis
+  229  jis-x-0213-plane2       JIS X 0213:2000/2004 level 4 (plane 2)
   ----------------------------------------------------------------
 
 =head1 DESCRIPTION

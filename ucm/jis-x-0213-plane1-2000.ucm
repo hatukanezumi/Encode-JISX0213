@@ -1,20 +1,18 @@
 #
 # $Id$
 #
-# JIS X 0213:2004 level 3 (plane 1) mapping.
+# JIS X 0213:2000 level 3 (plane 1) mapping.
 #
-# Originally taken from the work by Project X0213
-#   http://x0213.org/codetable/jisx0213-2004-std.txt
+# Originally taken from the work by wakaba
+#   http://web.archive.org/web/*/http://wakaba-web.hp.infoseek.co.jp/table/jisx0213-2000-std.txt
 # and following modifications are made:
 #
 # * 96 fallback mappings (|1) for alternative names described in Annex 5
 #   table 2, a.k.a. fullwidth forms, are added.
-# * 1-2-54 and 1-2-55 have fallback mappings from U+2985 and U+2986 which were
-#   allocated by JIS X 0213:2000.
 #
-<code_set_name>  "jisx0213-plane1"
-<mb_cur_min> 1
-<mb_cur_max> 1
+<code_set_name>  "jis-x-0213-plane1-2000"
+<mb_cur_min> 2
+<mb_cur_max> 2
 <subchar> \x3F
 #
 CHARMAP
@@ -199,10 +197,8 @@ CHARMAP
 <U2297> \x22\x53 |0 # 1-2-51
 <U2225> \x22\x54 |0 # 1-2-52
 <U2226> \x22\x55 |0 # 1-2-53
-<UFF5F> \x22\x56 |0 # 1-2-54 [2004]
-<U2985> \x22\x56 |1 # 1-2-54 [2000]
-<UFF60> \x22\x57 |0 # 1-2-55 [2004]
-<U2986> \x22\x57 |1 # 1-2-55 [2000]
+<U2985> \x22\x56 |0 # 1-2-54
+<U2986> \x22\x57 |0 # 1-2-55
 <U3018> \x22\x58 |0 # 1-2-56
 <U3019> \x22\x59 |0 # 1-2-57
 <U3016> \x22\x5A |0 # 1-2-58
@@ -1299,7 +1295,6 @@ CHARMAP
 <U22BF> \x2D\x79 |0 # 1-13-89
 <U2756> \x2D\x7D |0 # 1-13-93
 <U261E> \x2D\x7E |0 # 1-13-94
-<U4FF1> \x2E\x21 |0 # 1-14-1
 <U2000B> \x2E\x22 |0 # 1-14-2
 <U3402> \x2E\x23 |0 # 1-14-3
 <U4E28> \x2E\x24 |0 # 1-14-4
@@ -1486,7 +1481,6 @@ CHARMAP
 <U218BD> \x2F\x7B |0 # 1-15-91
 <U5B19> \x2F\x7C |0 # 1-15-92
 <U5B25> \x2F\x7D |0 # 1-15-93
-<U525D> \x2F\x7E |0 # 1-15-94
 <U4E9C> \x30\x21 |0 # 1-16-1
 <U5516> \x30\x22 |0 # 1-16-2
 <U5A03> \x30\x23 |0 # 1-16-3
@@ -4452,7 +4446,6 @@ CHARMAP
 <U6E7E> \x4F\x51 |0 # 1-47-49
 <U7897> \x4F\x52 |0 # 1-47-50
 <U8155> \x4F\x53 |0 # 1-47-51
-<U20B9F> \x4F\x54 |0 # 1-47-52
 <U5B41> \x4F\x55 |0 # 1-47-53
 <U5B56> \x4F\x56 |0 # 1-47-54
 <U5B7D> \x4F\x57 |0 # 1-47-55
@@ -4494,7 +4487,6 @@ CHARMAP
 <U5DA7> \x4F\x7B |0 # 1-47-91
 <U5DB8> \x4F\x7C |0 # 1-47-92
 <U5DCB> \x4F\x7D |0 # 1-47-93
-<U541E> \x4F\x7E |0 # 1-47-94
 <U5F0C> \x50\x21 |0 # 1-48-1
 <U4E10> \x50\x22 |0 # 1-48-2
 <U4E15> \x50\x23 |0 # 1-48-3
@@ -7885,7 +7877,6 @@ CHARMAP
 <U7464> \x74\x24 |0 # 1-84-4
 <U51DC> \x74\x25 |0 # 1-84-5
 <U7199> \x74\x26 |0 # 1-84-6
-<U5653> \x74\x27 |0 # 1-84-7
 <U5DE2> \x74\x28 |0 # 1-84-8
 <U5E14> \x74\x29 |0 # 1-84-9
 <U5E18> \x74\x2A |0 # 1-84-10
@@ -8908,9 +8899,4 @@ CHARMAP
 <U9F94> \x7E\x77 |0 # 1-94-87
 <U9F97> \x7E\x78 |0 # 1-94-88
 <U9FA2> \x7E\x79 |0 # 1-94-89
-<U59F8> \x7E\x7A |0 # 1-94-90
-<U5C5B> \x7E\x7B |0 # 1-94-91
-<U5E77> \x7E\x7C |0 # 1-94-92
-<U7626> \x7E\x7D |0 # 1-94-93
-<U7E6B> \x7E\x7E |0 # 1-94-94
 END CHARMAP

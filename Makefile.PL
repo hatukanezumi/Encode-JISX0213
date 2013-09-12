@@ -5,7 +5,8 @@ use ExtUtils::MakeMaker;
 
 my %tables = (
     raw_t => [
-	qw(jisx0213-2000-plane1.ucm jisx0213-plane1.ucm jisx0213-plane2.ucm)
+	qw(jis-x-0213-plane1-2000.ucm
+	jis-x-0213-plane1.ucm jis-x-0213-plane2.ucm)
     ],
     sjis_t => [qw(shift_jis-2004.ucm)],
 );

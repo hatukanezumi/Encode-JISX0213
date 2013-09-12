@@ -2,9 +2,10 @@
 #-*- coding: us-ascii -*-
 
 use strict;
-use Test::More tests => 19;
+use Test::More tests => 29;
 #use Test::More qw(no_plan);
 
+use Encode;
 use_ok('Encode::JISX0213');
 
 use File::Basename;
@@ -14,10 +15,10 @@ our $DEBUG = shift || 0;
 
 my %Charset =
     (
-     'x0213-2000-1' => [qw(euc-jisx0213 shift_jisx0213 iso-2022-jp-3)],
-     'x0213-2000-2' => [qw(euc-jisx0213 shift_jisx0213 iso-2022-jp-3)],
-     'x0213-1' => [qw(euc-jis-2004 shift_jis-2004 iso-2022-jp-2004)],
-     'x0213-2' => [qw(euc-jis-2004 shift_jis-2004 iso-2022-jp-2004)],
+     'x0213-1-ascii' => [qw(euc-jis-2004 shift_jis-2004 iso-2022-jp-2004)],
+     'x0213-2' => [qw(euc-jis-2004 shift_jis-2004 iso-2022-jp-2004
+	euc-jisx0213 iso-2022-jp-3)],
+     'x0213-2000-1-ascii' => [qw(euc-jisx0213 iso-2022-jp-3)],
     );
 
 my $dir = dirname(__FILE__);
@@ -30,6 +31,7 @@ for my $charset (sort keys %Charset){
 
     my $src_enc = File::Spec->catfile($dir, File::Spec->updir, 'test-data',
 	"$charset.enc");
+    $src_enc =~ s/-ascii//;
     my $src_utf = File::Spec->catfile($dir, File::Spec->updir, 'test-data',
 	"$charset.utf");
     my $dst_enc = File::Spec->catfile($dir, File::Spec->updir, 'test-data',
@@ -45,8 +47,10 @@ for my $charset (sort keys %Charset){
     
     eval{ $uni = $transcoder->decode($txt, 1) }; 
     $@ and print $@;
-    ok(defined($uni),  "decode $charset"); $seq++;
-    unless(is(length($txt),0, "decode $charset completely")){
+    ok(defined($uni), sprintf('decode %s by %s', $charset, $transcoder->name));
+    $seq++;
+    unless(is(length($txt), 0,
+	sprintf('decode %s by %s completely', $charset, $transcoder->name))){
 	$seq++;
 	$DEBUG and dump_txt($txt, "t/$$.$seq");
     }else{
@@ -81,8 +85,10 @@ for my $charset (sort keys %Charset){
 
     eval{ $txt = $transcoder->encode($uni,1) };    
     $@ and print $@;
-    ok(defined($txt),   "encode $charset"); $seq++;
-    unless(is(length($uni), 0, "encode $charset completely")){
+    ok(defined($txt), sprintf('encode %s by %s', $charset, $transcoder->name));
+    $seq++;
+    unless(is(length($uni), 0,
+	sprintf('encode %s by %s completely', $charset, $transcoder->name))){
 	$seq++;
 	$DEBUG and dump_txt($uni, "t/$$.$seq");
     }else{
