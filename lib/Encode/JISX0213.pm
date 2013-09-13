@@ -4,8 +4,9 @@ use strict;
 use warnings;
 use Encode::ISO2022;
 our @ISA     = qw/Encode::ISO2022/;
-our $VERSION = '0.0_04';
+our $VERSION = '0.0_05';
 
+use Encode::ISOIRSingle;
 use Encode::JISLegacy;
 use Encode::JISX0213::CCS;
 
@@ -37,7 +38,7 @@ $Encode::Encoding{'euc-jis-2004'} = bless {
 
 	# Nonstandard
 	{   bytes    => 2,
-	    encoding => $Encode::Encoding{'jis-x-0212'},
+	    encoding => $Encode::Encoding{'jis-x-0212-ascii'},
 	    gr       => 1,
 	    g_init   => 'g3',
 	    ss       => "\x8F",
@@ -79,7 +80,7 @@ $Encode::Encoding{'euc-jisx0213'} = bless {
 
 	# Nonstandard
 	{   bytes    => 2,
-	    encoding => $Encode::Encoding{'jis-x-0212'},
+	    encoding => $Encode::Encoding{'jis-x-0212-ascii'},
 	    gr       => 1,
 	    g_init   => 'g3',
 	    ss       => "\x8F",

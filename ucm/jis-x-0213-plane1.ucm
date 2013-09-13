@@ -15,7 +15,7 @@
 <code_set_name>  "jis-x-0213-plane1"
 <mb_cur_min> 2
 <mb_cur_max> 2
-<subchar> \x3F
+<subchar> \x22\x2E
 #
 CHARMAP
 <U3000> \x21\x21 |0 # 1-1-1

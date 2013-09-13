@@ -14,8 +14,8 @@
 #
 <code_set_name>  "shift_jis-2004"
 <mb_cur_min> 1
-<mb_cur_max> 1
-<subchar> \x3F
+<mb_cur_max> 2
+<subchar> \x81\xAC
 #
 CHARMAP
 <U0000> \x00 |0 # <control>

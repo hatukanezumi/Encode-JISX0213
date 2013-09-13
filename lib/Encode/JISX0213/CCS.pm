@@ -5,8 +5,16 @@ use warnings;
 use base qw(Encode::Encoding);
 our $VERSION = '0.01';
 
+use Carp qw(carp croak);
 use XSLoader;
 XSLoader::load('Encode::JISX0213', $VERSION);
+
+my $err_encode_nomap = '"\x{%*v04X}" does not map to %s';
+
+my $DIE_ON_ERR = Encode::DIE_ON_ERR();
+my $LEAVE_SRC = Encode::LEAVE_SRC();
+my $PERLQQ = Encode::PERLQQ();
+my $WARN_ON_ERR = Encode::WARN_ON_ERR();
 
 foreach my $encoding (qw/jis-x-0213-plane1 jis-x-0213-plane1-2000/) {
     foreach my $alt (qw/ascii jis/) {
@@ -18,22 +26,111 @@ foreach my $encoding (qw/jis-x-0213-plane1 jis-x-0213-plane1-2000/) {
     }
 }
 
+# Workaround for encengine.c which cannot correctly map Unicode sequence
+# with multiple characters.
+my %composed = (
+    "\x{304B}\x{309A}" => "\x24\x77",
+    "\x{304D}\x{309A}" => "\x24\x78",
+    "\x{304F}\x{309A}" => "\x24\x79",
+    "\x{3051}\x{309A}" => "\x24\x7A",
+    "\x{3053}\x{309A}" => "\x24\x7B",
+    "\x{30AB}\x{309A}" => "\x25\x77",
+    "\x{30AD}\x{309A}" => "\x25\x78",
+    "\x{30AF}\x{309A}" => "\x25\x79",
+    "\x{30B1}\x{309A}" => "\x25\x7A",
+    "\x{30B3}\x{309A}" => "\x25\x7B",
+    "\x{30BB}\x{309A}" => "\x25\x7C",
+    "\x{30C4}\x{309A}" => "\x25\x7D",
+    "\x{30C8}\x{309A}" => "\x25\x7E",
+    "\x{31F7}\x{309A}" => "\x26\x78",
+    "\x{00E6}\x{0300}" => "\x2B\x44",
+    "\x{0254}\x{0300}" => "\x2B\x48",
+    "\x{0254}\x{0301}" => "\x2B\x49",
+    "\x{028C}\x{0300}" => "\x2B\x4A",
+    "\x{028C}\x{0301}" => "\x2B\x4B",
+    "\x{0259}\x{0300}" => "\x2B\x4C",
+    "\x{0259}\x{0301}" => "\x2B\x4D",
+    "\x{025A}\x{0300}" => "\x2B\x4E",
+    "\x{025A}\x{0301}" => "\x2B\x4F",
+    "\x{0301}"         => "\x2B\x5A",
+    "\x{0300}"         => "\x2B\x5C",
+    "\x{02E5}"         => "\x2B\x60",
+    "\x{02E9}"         => "\x2B\x64",
+    "\x{02E9}\x{02E5}" => "\x2B\x65",
+    "\x{02E5}\x{02E9}" => "\x2B\x66",
+);
+
 sub encode {
     my ($self, $utf8, $chk) = @_;
 
-    my $residue = '';
-    if ($self->{alt} eq 'ascii') {
-	if ($utf8 =~ s/([\x21-\x7E].*)$//s) {
-	    $residue = $1;
-	}
-    } elsif ($self->{alt} eq 'jis') {
-	if ($utf8 =~ s/([\x21-\x5B\x{00A5}\x5D-\x7D\x{203E}].*)$//s) {
-	    $residue = $1;
+    my $chk_flags = $chk;
+    if (ref $chk) {
+	$chk_flags = $LEAVE_SRC | $PERLQQ;
+    }
+
+    my $residue;
+    my $conv;
+
+    $residue = '';
+    if ($self->{alt} eq 'ascii' and
+	$utf8 =~ s/([\x21-\x7E].*)$//s or
+	$self->{alt} eq 'jis' and
+	$utf8 =~ s/([\x21-\x5B\x{00A5}\x5D-\x7D\x{203E}].*)$//s) {
+	$residue = $1;
+	if ($chk_flags & $DIE_ON_ERR) {
+	    croak sprintf $err_encode_nomap, '}\x{', substr($residue, 0, 1);
 	}
     }
-    my $conv = $self->{encoding}->encode($utf8, $chk);
 
-    $_[1] = $utf8 . $residue;
+    while ($utf8 =~
+	s{  \A
+	    (.*?)
+	    (
+		\x{02E9} \x{02E5} |
+		\x{02E5} \x{02E9} |
+		. [\x{0300}\x{0301}\x{309A}] |
+		[\x{02E5}\x{02E9}\x{0300}\x{0301}] |
+		\z
+	    )
+	}{}sx
+    ) {
+	my ($chunk, $mc) = ($1, $2);
+	last unless length $chunk or length $mc;
+
+	if (length $chunk) {
+	    $conv .= $self->{encoding}->encode(
+		$chunk,
+		(ref($chk) ? $chk : ($chk_flags & ~$LEAVE_SRC))
+	    );
+	}
+	if (length $chunk) {
+	    $utf8 = $chunk . $mc . $utf8;
+	    last;
+	}
+
+	next unless length $mc;
+	if ($composed{$mc}) {
+	    $conv .= $composed{$mc};
+	    next;
+	}
+	$conv .= $self->{encoding}->encode(
+	    $mc,
+	    (ref($chk) ? $chk : ($chk_flags & ~$LEAVE_SRC))
+	);
+	if (length $mc) {
+	    $utf8 = $mc . $utf8;
+	    last;
+	}
+    }
+
+    if (not length $utf8 and length $residue) {
+	if ($chk_flags & $WARN_ON_ERR) {
+	    carp sprintf $err_encode_nomap, '}\x{', substr($residue, 0, 1);
+	}
+	#FIXME:"best efort" replacement
+    }
+
+    $_[1] = $utf8 . $residue unless $chk_flags & $LEAVE_SRC;
     return $conv;
 }
 
