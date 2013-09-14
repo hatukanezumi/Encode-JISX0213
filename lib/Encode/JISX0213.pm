@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Encode::ISO2022;
 our @ISA     = qw/Encode::ISO2022/;
-our $VERSION = '0.0_05';
+our $VERSION = '0.000_07';
 
 use Encode::ISOIRSingle;
 use Encode::JISLegacy;
@@ -115,7 +115,7 @@ $Encode::Encoding{'iso-2022-jp-2004'} = bless {
 	    g_seq    => "\e\x24\x28\x4F",
 	},
 	{   bytes    => 2,
-	    encoding => $Encode::Encoding{'jis-x-0208'},
+	    encoding => $Encode::Encoding{'jis-x-0208-ascii'},
 	    g        => 'g0',
 	    g_seq    => "\e\x24\x42",
 	},
@@ -135,7 +135,7 @@ $Encode::Encoding{'iso-2022-jp-2004-compatible'} = bless {
 	    g_seq    => "\e\x28\x42",
 	},
 	{   bytes    => 2,
-	    encoding => $Encode::Encoding{'jis-x-0208'},
+	    encoding => $Encode::Encoding{'jis-x-0208-ascii'},
 	    g        => 'g0',
 	    g_seq    => "\e\x24\x42",
 	},
@@ -183,7 +183,7 @@ $Encode::Encoding{'iso-2022-jp-3'} = bless {
 
 	# Unrecommended encoding.
 	{   bytes    => 2,
-	    encoding => $Encode::Encoding{'jis-x-0208'},
+	    encoding => $Encode::Encoding{'jis-x-0208-ascii'},
 	    g        => 'g0',
 	    g_seq    => "\e\x24\x42",
 	},
@@ -234,7 +234,9 @@ To find out how to use this module in detail, see L<Encode>.
 
 =head2 Note on Variants
 
-FIXME FIXME
+The encoding prefixed "-compatible" uses JIS X 0208 for bit combinations
+co-existing on JIS X 0208 and JIS X 0213 plane1.  It is I<not> compatible
+to normal encodings.
 
 =head1 SEE ALSO
 

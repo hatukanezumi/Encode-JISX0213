@@ -16,12 +16,16 @@ my $LEAVE_SRC = Encode::LEAVE_SRC();
 my $PERLQQ = Encode::PERLQQ();
 my $WARN_ON_ERR = Encode::WARN_ON_ERR();
 
-foreach my $encoding (qw/jis-x-0213-plane1 jis-x-0213-plane1-2000/) {
-    foreach my $alt (qw/ascii jis/) {
-	$Encode::Encoding{"$encoding-$alt"} = bless {
-	    Name => "$encoding-$alt",
+foreach my $encoding (
+    qw/jis-x-0208 jis-x-0213-plane1 jis-x-0213-plane1-2000/
+) {
+    foreach my $alt ('', 'ascii', 'jis') {
+	my $name = $encoding . ($alt ? "-$alt" : "");
+	$Encode::Encoding{$name} = bless {
+	    Name => $name,
 	    alt => $alt,
-	    encoding => $Encode::Encoding{$encoding},
+	    encoding => $Encode::Encoding{"$encoding-canonic"},
+	    jisx0213 => ($name =~ /jis-x-0213/ ? 1 : 0),
 	} => __PACKAGE__;
     }
 }
@@ -68,12 +72,13 @@ sub encode {
 	$chk_flags = $LEAVE_SRC | $PERLQQ;
     }
 
-    my $residue;
     my $conv;
+    my $residue = '';
 
-    $residue = '';
-    if ($self->{alt} eq 'ascii' and
-	$utf8 =~ s/([\x21-\x7E].*)$//s or
+    if ($self->{jisx0213} and
+	$self->{alt} eq 'ascii' and $utf8 =~ s/([\x21-\x7E].*)$//s or
+	not $self->{jisx0213} and
+	$self->{alt} eq 'ascii' and $utf8 =~ s/([\x21-\x5B\x5D-\x7D].*)$//s or
 	$self->{alt} eq 'jis' and
 	$utf8 =~ s/([\x21-\x5B\x{00A5}\x5D-\x7D\x{203E}].*)$//s) {
 	$residue = $1;
@@ -82,6 +87,16 @@ sub encode {
 	}
     }
 
+    # JIS X 0208
+    unless ($self->{jisx0213}) {
+	if ($utf8 =~ s/(.[\x{0300}-\x{036F}\x{309A}].*)$//s) {
+	    $residue = $1 . $residue;
+	}
+	$conv = $self->{encoder}->encode($utf8, $chk);
+	goto ENCODE_LAST;
+    }
+
+    # JIS X 0213
     while ($utf8 =~
 	s{  \A
 	    (.*?)
@@ -123,6 +138,7 @@ sub encode {
 	}
     }
 
+  ENCODE_LAST:
     if (not length $utf8 and length $residue) {
 	if ($chk_flags & $WARN_ON_ERR) {
 	    carp sprintf $err_encode_nomap, '}\x{', substr($residue, 0, 1);
@@ -157,22 +173,24 @@ Encode::JISX0213::CCS - JIS X 0213 coded character sets
 
 =head1 ABSTRACT
 
-  This module provides followng coded character sets.
+This module provides followng coded character sets.
 
   reg# Name                    Description
   ----------------------------------------------------------------
-  228  jis-x-0213-plane1-2000  JIS X 0213:2000 level 3 (plane 1)
-       jis-x-0213-plane1-2000-ascii
-       jis-x-0213-plane1-2000-jis
+   87  jis-x-0208              JIS X 0208-1983, 2nd rev. of JIS X 0208
+  168      ditto               JIS X 0208-1990, 3rd rev. of JIS X 0208
+       jis-x-0208-ascii
+       jis-x-0208-jis
   233  jis-x-0213-plane1       JIS X 0213:2004 level 3 (plane 1)
        jis-x-0213-plane1-ascii
        jis-x-0213-plane1-jis
+  228  jis-x-0213-plane1-2000  JIS X 0213:2000 level 3 (plane 1)
+       jis-x-0213-plane1-2000-ascii
+       jis-x-0213-plane1-2000-jis
   229  jis-x-0213-plane2       JIS X 0213:2000/2004 level 4 (plane 2)
   ----------------------------------------------------------------
 
 =head1 DESCRIPTION
-
-FIXME FIXME
 
 =head2 Note on Variants
 

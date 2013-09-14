@@ -10,7 +10,7 @@
 # * 96 fallback mappings (|1) for alternative names described in Annex 5
 #   table 2, a.k.a. fullwidth forms, are added.
 #
-<code_set_name>  "jis-x-0213-plane1-2000"
+<code_set_name>  "jis-x-0213-plane1-2000-canonic"
 <mb_cur_min> 2
 <mb_cur_max> 2
 <subchar> \x22\x2E

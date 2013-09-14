@@ -18,6 +18,7 @@ test-data/x0213-2000-1.enc
 test-data/x0213-2000-1.utf
 test-data/x0213-2000-2.utf
 #ucm/jisx0208x0213.ucm
+ucm/jis-x-0208.ucm
 ucm/jis-x-0213-plane1-2000.ucm
 ucm/jis-x-0213-plane1.ucm
 ucm/jis-x-0213-plane2.ucm
