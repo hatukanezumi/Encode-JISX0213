@@ -199,6 +199,8 @@ Encode::define_alias(qr/\bshift.*jis.*2004$/, '"shift_jis-2004"');
 1;
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
 Encode::JISX0213 - JIS X 0213 encodings
@@ -234,11 +236,16 @@ To find out how to use this module in detail, see L<Encode>.
 
 =head2 Note on Variants
 
-The encoding prefixed "-compatible" uses JIS X 0208 for bit combinations
-co-existing on JIS X 0208 and JIS X 0213 plane1.  It is I<not> compatible
-to normal encodings.
+The encoding suffixed "-compatible" uses JIS X 0208 for the bit combinations
+co-existing on JIS X 0208 and JIS X 0213 plane 1.  It is I<not> compatible
+to normal encodings; it had never been registered by any standards bodies.
 
 =head1 SEE ALSO
+
+JIS X 0213:2000
+I<7ビット及び8ビットの2バイト情報交換用符号化拡張漢字集合>
+(I<7-bit and 8-bit double byte coded extended KANJI sets for information
+interchange>), and its amendment JIS X 0213:2000/AMENDMENT 1:2004.
 
 L<Encode>, L<Encode::JP>, L<Encode::ISO2022JP2>.
 

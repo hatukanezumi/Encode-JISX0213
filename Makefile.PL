@@ -62,6 +62,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/Encode/JISX0213.pm',
     ABSTRACT_FROM => 'lib/Encode/JISX0213.pm',
     AUTHOR        => 'Hatuka*nezumi - IKEDA Soji <hatuka@nezumi.nu>',
+    LICENSE       => 'perl',
     CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 0,},
     BUILD_REQUIRES     => {
         'ExtUtils::MakeMaker' => 0,

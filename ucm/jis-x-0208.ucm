@@ -1,6 +1,13 @@
 #
 # $Id$
 #
+# Modifications:
+#
+# * 91 fallback mappings (|1) for alternative names described in Annex 5
+#   table 2, a.k.a. fullwidth forms, are added.
+# * One more fallback mapping (|1) for FULLWIDTH REVERSE SOLIDUS which is not
+#   listed in the table described above.
+#
 <code_set_name>  "jis-x-0208-canonic"
 <mb_cur_min> 2
 <mb_cur_max> 2
@@ -50,7 +57,7 @@ CHARMAP
 <U002F> \x21\x3F |0 # SOLIDUS
 <UFF0F> \x21\x3F |1 # FULLWIDTH SOLIDUS
 <U005C> \x21\x40 |0 # REVERSE SOLIDUS
-#<UFF3C> \x21\x40 |1 # FULLWIDTH REVERSE SOLIDUS
+<UFF3C> \x21\x40 |1 # FULLWIDTH REVERSE SOLIDUS (not in Annex 5 table 2)
 <U301C> \x21\x41 |0 # WAVE DASH
 <U2016> \x21\x42 |0 # DOUBLE VERTICAL LINE
 <U007C> \x21\x43 |0 # VERTICAL LINE

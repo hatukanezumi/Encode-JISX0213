@@ -14,6 +14,7 @@ my $err_encode_nomap = '"\x{%*v04X}" does not map to %s';
 my $DIE_ON_ERR = Encode::DIE_ON_ERR();
 my $LEAVE_SRC = Encode::LEAVE_SRC();
 my $PERLQQ = Encode::PERLQQ();
+my $RETURN_ON_ERR = Encode::RETURN_ON_ERR();
 my $WARN_ON_ERR = Encode::WARN_ON_ERR();
 
 foreach my $encoding (
@@ -75,10 +76,8 @@ sub encode {
     my $conv;
     my $residue = '';
 
-    if ($self->{jisx0213} and
-	$self->{alt} eq 'ascii' and $utf8 =~ s/([\x21-\x7E].*)$//s or
-	not $self->{jisx0213} and
-	$self->{alt} eq 'ascii' and $utf8 =~ s/([\x21-\x5B\x5D-\x7D].*)$//s or
+  ENCODE_LOOP:
+    if ($self->{alt} eq 'ascii' and $utf8 =~ s/([\x21-\x7E].*)$//s or
 	$self->{alt} eq 'jis' and
 	$utf8 =~ s/([\x21-\x5B\x{00A5}\x5D-\x7D\x{203E}].*)$//s) {
 	$residue = $1;
@@ -140,10 +139,24 @@ sub encode {
 
   ENCODE_LAST:
     if (not length $utf8 and length $residue) {
+	my $errChar = substr($residue, 0, 1);
+	my $subChar;
+
 	if ($chk_flags & $WARN_ON_ERR) {
-	    carp sprintf $err_encode_nomap, '}\x{', substr($residue, 0, 1);
+	    carp sprintf $err_encode_nomap, '}\x{', $errChar;
 	}
-	#FIXME:"best efort" replacement
+	unless ($chk_flags & $RETURN_ON_ERR) {
+	    if ($chk_flags & $PERLQQ) {
+		$subChar = sprintf '\x{%v*04X}', '}\x{', $errChar;
+	    } else {
+		$subChar = $self->{encoding}->encode($self->{SubChar} || '?');
+	    }
+	    $conv .= $subChar;
+
+	    substr($residue, 0, 1) = '';
+	    ($utf8, $residue) = ($residue, '');
+	    goto ENCODE_LOOP;
+	}
     }
 
     $_[1] = $utf8 . $residue unless $chk_flags & $LEAVE_SRC;
@@ -192,14 +205,17 @@ This module provides followng coded character sets.
 
 =head1 DESCRIPTION
 
+To find out how to use this module in detail,
+see L<Encode> and L<Encode::ISO2022>.
+
 =head2 Note on Variants
 
-Those prefixed "-ascii" and "-jis" use alternative names for the characters
+Those suffixed "-ascii" and "-jis" use alternative names for the characters
 compatible to ISO/IEC 646 IRV and JIS X 0201 Latin set, respectively.
 
 =head1 SEE ALSO
 
-L<Encode::ISO2022::CCS>.
+L<Encode>, L<Encode::ISO2022>, L<Encode::ISO2022::CCS>.
 
 =head1 AUTHOR
 
