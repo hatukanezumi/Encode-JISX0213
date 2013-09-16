@@ -13,7 +13,6 @@ my $err_encode_nomap = '"\x{%*v04X}" does not map to %s';
 
 my $DIE_ON_ERR = Encode::DIE_ON_ERR();
 my $LEAVE_SRC = Encode::LEAVE_SRC();
-my $PERLQQ = Encode::PERLQQ();
 my $RETURN_ON_ERR = Encode::RETURN_ON_ERR();
 my $WARN_ON_ERR = Encode::WARN_ON_ERR();
 
@@ -65,15 +64,30 @@ my %composed = (
     "\x{02E5}\x{02E9}" => "\x2B\x66",
 );
 
+# substitution cacharcter for multibyte.
+my $subChar = "\x22\x2E"; # GETA MARK
+
 sub encode {
     my ($self, $utf8, $chk) = @_;
 
-    my $chk_flags = $chk;
-    if (ref $chk) {
-	$chk_flags = $LEAVE_SRC | $PERLQQ;
+    # Workaround for built-in "best effort" encoding: it cannot handle
+    # multibyte subchar; its PERLQQ, HTMLCREF and XMLCREF scheme are useless.
+    my $chk_sub;
+    if (ref $chk eq 'CODE') {
+	$chk_sub = $chk;
+	$chk = $LEAVE_SRC;
+    } elsif ($chk & ($DIE_ON_ERR | $RETURN_ON_ERR)) {
+	$chk_sub = $chk & ~$LEAVE_SRC;
+    } elsif ($chk & ($WARN_ON_ERR)) {
+	$chk_sub = sub {
+	    carp sprintf $err_encode_nomap, '}\x{', chr(shift), $self->{Name};
+	    $subChar;
+	};
+    } else {
+	$chk_sub = sub { $subChar };
     }
 
-    my $conv;
+    my $conv = '';
     my $residue = '';
 
   ENCODE_LOOP:
@@ -81,77 +95,64 @@ sub encode {
 	$self->{alt} eq 'jis' and
 	$utf8 =~ s/([\x21-\x5B\x{00A5}\x5D-\x7D\x{203E}].*)$//s) {
 	$residue = $1;
-	if ($chk_flags & $DIE_ON_ERR) {
-	    croak sprintf $err_encode_nomap, '}\x{', substr($residue, 0, 1);
+	if ($chk & $DIE_ON_ERR) {
+	    croak sprintf $err_encode_nomap, '}\x{',
+		substr($residue, 0, 1), $self->{Name};
 	}
     }
 
-    # JIS X 0208
     unless ($self->{jisx0213}) {
+	# JIS X 0208
 	if ($utf8 =~ s/(.[\x{0300}-\x{036F}\x{309A}].*)$//s) {
 	    $residue = $1 . $residue;
 	}
-	$conv = $self->{encoder}->encode($utf8, $chk);
-	goto ENCODE_LAST;
-    }
+	$conv .= $self->{encoding}->encode($utf8, $chk_sub);
+    } else {
+	# JIS X 0213
+	while ($utf8 =~
+	   s{  \A
+		(.*?)
+		(
+		    \x{02E9} \x{02E5} |
+		    \x{02E5} \x{02E9} |
+		    . [\x{0300}\x{0301}\x{309A}] |
+		    [\x{02E5}\x{02E9}\x{0300}\x{0301}] |
+		    \z
+		)
+	    }{}sx
+	) {
+	    my ($chunk, $mc) = ($1, $2);
+	    last unless length $chunk or length $mc;
 
-    # JIS X 0213
-    while ($utf8 =~
-	s{  \A
-	    (.*?)
-	    (
-		\x{02E9} \x{02E5} |
-		\x{02E5} \x{02E9} |
-		. [\x{0300}\x{0301}\x{309A}] |
-		[\x{02E5}\x{02E9}\x{0300}\x{0301}] |
-		\z
-	    )
-	}{}sx
-    ) {
-	my ($chunk, $mc) = ($1, $2);
-	last unless length $chunk or length $mc;
+	    if (length $chunk) {
+		$conv .= $self->{encoding}->encode($chunk, $chk_sub);
+	    }
+	    if (length $chunk) {
+		$utf8 = $chunk . $mc . $utf8;
+		last;
+	    }
 
-	if (length $chunk) {
-	    $conv .= $self->{encoding}->encode(
-		$chunk,
-		(ref($chk) ? $chk : ($chk_flags & ~$LEAVE_SRC))
-	    );
-	}
-	if (length $chunk) {
-	    $utf8 = $chunk . $mc . $utf8;
-	    last;
-	}
-
-	next unless length $mc;
-	if ($composed{$mc}) {
-	    $conv .= $composed{$mc};
-	    next;
-	}
-	$conv .= $self->{encoding}->encode(
-	    $mc,
-	    (ref($chk) ? $chk : ($chk_flags & ~$LEAVE_SRC))
-	);
-	if (length $mc) {
-	    $utf8 = $mc . $utf8;
-	    last;
+	    next unless length $mc;
+	    if ($composed{$mc}) {
+		$conv .= $composed{$mc};
+		next;
+	    }
+	    $conv .= $self->{encoding}->encode($mc, $chk_sub);
+	    if (length $mc) {
+		$utf8 = $mc . $utf8;
+		last;
+	    }
 	}
     }
 
-  ENCODE_LAST:
     if (not length $utf8 and length $residue) {
 	my $errChar = substr($residue, 0, 1);
-	my $subChar;
 
-	if ($chk_flags & $WARN_ON_ERR) {
-	    carp sprintf $err_encode_nomap, '}\x{', $errChar;
+	if (($chk & $WARN_ON_ERR) and ($chk & $RETURN_ON_ERR)) {
+	    carp sprintf $err_encode_nomap, '}\x{', $errChar, $self->{Name};
 	}
-	unless ($chk_flags & $RETURN_ON_ERR) {
-	    if ($chk_flags & $PERLQQ) {
-		$subChar = sprintf '\x{%v*04X}', '}\x{', $errChar;
-	    } else {
-		$subChar = $self->{encoding}->encode($self->{SubChar} || '?');
-	    }
-	    $conv .= $subChar;
+	unless ($chk & $RETURN_ON_ERR) {
+	    $conv .= $chk_sub->(ord $errChar);
 
 	    substr($residue, 0, 1) = '';
 	    ($utf8, $residue) = ($residue, '');
@@ -159,7 +160,7 @@ sub encode {
 	}
     }
 
-    $_[1] = $utf8 . $residue unless $chk_flags & $LEAVE_SRC;
+    $_[1] = $utf8 . $residue unless $chk & $LEAVE_SRC;
     return $conv;
 }
 

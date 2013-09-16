@@ -69,6 +69,7 @@ WriteMakefile(
         'Test::More'          => 0,
     },
     PREREQ_PM     => {
+        'Encode'              => '2.12',
         'Encode::ISO2022'     => 0,
     },
     META_MERGE    => {

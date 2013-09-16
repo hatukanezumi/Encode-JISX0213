@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Encode::ISO2022;
 our @ISA     = qw/Encode::ISO2022/;
-our $VERSION = '0.000_07';
+our $VERSION = '0.000_08';
 
 use Encode::ISOIRSingle;
 use Encode::JISLegacy;
