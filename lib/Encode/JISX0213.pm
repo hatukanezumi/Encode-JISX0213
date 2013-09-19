@@ -2,9 +2,8 @@ package Encode::JISX0213;
 
 use strict;
 use warnings;
-use Encode::ISO2022;
-our @ISA     = qw/Encode::ISO2022/;
-our $VERSION = '0.01_00';
+use base qw(Encode::ISO2022);
+our $VERSION = '0.01_03';
 
 use Encode::ISOIRSingle;
 use Encode::JISLegacy;
@@ -121,6 +120,7 @@ $Encode::Encoding{'iso-2022-jp-2004'} = bless {
 
 	# Unrecommended encodings.
 	{   bytes    => 2,
+	    dec_only => 1,
 	    encoding => $Encode::Encoding{'jis-x-0213-plane1-2000-ascii'},
 	    g        => 'g0',
 	    g_seq    => "\e\x24\x28\x4F",
@@ -130,6 +130,7 @@ $Encode::Encoding{'iso-2022-jp-2004'} = bless {
 	    encoding => $Encode::Encoding{'jis-x-0208-ascii'},
 	    g        => 'g0',
 	    g_seq    => "\e\x24\x42",
+	    ss       => '', # encodes runs as short as possible
 	    range    => '\x21-\x7E',
 	},
 
@@ -139,9 +140,9 @@ $Encode::Encoding{'iso-2022-jp-2004'} = bless {
     SubChar => "\x{3013}",
 } => __PACKAGE__;
 
-Encode::define_alias(qr/\biso-?2022-?jp-?2004-?compatible$/i =>
-	'"iso-2022-jp-2004-compatible"');
-$Encode::Encoding{'iso-2022-jp-2004-compatible'} = bless {
+Encode::define_alias(qr/\biso-?2022-?jp-?2004-?strict$/i =>
+	'"x-iso-2022-jp-2004-strict"');
+$Encode::Encoding{'x-iso-2022-jp-2004-strict'} = bless {
     'CCS' => [
 	{   cl       => 1,
 	    encoding => $Encode::Encoding{'ascii'},
@@ -149,7 +150,7 @@ $Encode::Encoding{'iso-2022-jp-2004-compatible'} = bless {
 	    g_seq    => "\e\x28\x42",
 	},
 	{   bytes    => 2,
-	    encoding => $Encode::Encoding{'jis-x-0208-ascii'},
+	    encoding => $Encode::Encoding{'jis-x-0208-0213-ascii'},
 	    g        => 'g0',
 	    g_seq    => "\e\x24\x42",
 	    range    => '\x21-\x7E',
@@ -158,7 +159,7 @@ $Encode::Encoding{'iso-2022-jp-2004-compatible'} = bless {
 	    encoding => $Encode::Encoding{'jis-x-0213-plane1-ascii'},
 	    g        => 'g0',
 	    g_seq    => "\e\x24\x28\x51",
-	    ss       => '',
+	    ss       => '', # encodes runs as short as possible
 	    range    => '\x21-\x7E',
 	},
 	{   bytes    => 2,
@@ -179,7 +180,51 @@ $Encode::Encoding{'iso-2022-jp-2004-compatible'} = bless {
 
 	# Nonstandard
     ],
-    Name    => 'iso-2022-jp-2004',
+    Name    => 'x-iso-2022-jp-2004-strict',
+    SubChar => "\x{3013}",
+} => __PACKAGE__;
+
+Encode::define_alias(qr/\biso-?2022-?jp-?2004-?compatible$/i =>
+	'"x-iso-2022-jp-2004-compatible"');
+$Encode::Encoding{'x-iso-2022-jp-2004-compatible'} = bless {
+    'CCS' => [
+	{   cl       => 1,
+	    encoding => $Encode::Encoding{'ascii'},
+	    g_init   => 'g0',
+	    g_seq    => "\e\x28\x42",
+	},
+	{   bytes    => 2,
+	    encoding => $Encode::Encoding{'jis-x-0208-ascii'},
+	    g        => 'g0',
+	    g_seq    => "\e\x24\x42",
+	    range    => '\x21-\x7E',
+	},
+	{   bytes    => 2,
+	    encoding => $Encode::Encoding{'jis-x-0213-plane1-ascii'},
+	    g        => 'g0',
+	    g_seq    => "\e\x24\x28\x51",
+	    ss       => '', # encodes runs as short as possible
+	    range    => '\x21-\x7E',
+	},
+	{   bytes    => 2,
+	    encoding => $Encode::Encoding{'jis-x-0213-plane2'},
+	    g        => 'g0',
+	    g_seq    => "\e\x24\x28\x50",
+	    range    => '\x21-\x7E',
+	},
+
+	# Unrecommended encodings.
+	{   bytes    => 2,
+	    dec_only => 1,
+	    encoding => $Encode::Encoding{'jis-x-0213-plane1-2000-ascii'},
+	    g        => 'g0',
+	    g_seq    => "\e\x24\x28\x4F",
+	    range    => '\x21-\x7E',
+	},
+
+	# Nonstandard
+    ],
+    Name    => 'x-iso-2022-jp-2004-compatible',
     SubChar => "\x{3013}",
 } => __PACKAGE__;
 
@@ -209,6 +254,7 @@ $Encode::Encoding{'iso-2022-jp-3'} = bless {
 	    encoding => $Encode::Encoding{'jis-x-0208-ascii'},
 	    g        => 'g0',
 	    g_seq    => "\e\x24\x42",
+	    ss       => '', # encodes runs as short as possible
 	    range    => '\x21-\x7E',
 	},
 
@@ -242,16 +288,30 @@ This module provides following encodings.
 
   Canonical         Alias                         Description
   --------------------------------------------------------------
-  euc-jis-2004      qr/\beuc-?(jis|jp)-?2004$/i   JIS X 0213:2004
+  euc-jis-2004      qr/\beuc-?(jis|jp)-?2004$/i   EUC encoding
+  iso-2022-jp-2004  qr/\biso-?2022-?jp-?2004$/i   7-bit encoding
+  shift_jis-2004    qr/\bshift.*jis.*2004$/i      "shift" encoding
+  --------------------------------------------------------------
+
+For older release of JIS X 0213:
+
+  Canonical         Alias                         Description
+  --------------------------------------------------------------
   euc-jisx0213      qr/\beucjisx0213$/i           JIS X 0213:2000
                     qr/\beuc.*jp[ \-]?(?:2000|2k)$/i
                     qr/\bjp.*euc[ \-]?(2000|2k)$/i
                     qr/\bujis[ \-]?(?:2000|2k)$/i
-  iso-2022-jp-2004  qr/\biso-?2022-?jp-?2004$/i   JIS X 0213:2004
-  iso-2022-jp-2004-compatible                     See note.
-                    qr/\biso-?2022-?jp-?2004-?compatible$/i
   iso-2022-jp-3     qr/\biso-?2022-?jp-?3$/i      JIS X 0213:2000
-  shift_jis-2004    qr/\bshift.*jis.*2004$/i      JIS X 0213:2004
+  --------------------------------------------------------------
+
+For transition from legacy standards:
+
+  Canonical         Alias                         Description
+  --------------------------------------------------------------
+  x-iso-2022-jp-2004-compatible                   See note.
+                    qr/\biso-?2022-?jp-?2004-?compatible$/i
+  x-iso-2022-jp-2004-strict                       See note.
+                    qr/\biso-?2022-?jp-?2004-?strict$/i
   --------------------------------------------------------------
 
 =head1 DESCRIPTION
@@ -260,9 +320,19 @@ To find out how to use this module in detail, see L<Encode>.
 
 =head2 Note on Variants
 
-The encoding suffixed "-compatible" uses JIS X 0208 for the bit combinations
-co-existing on JIS X 0208 and JIS X 0213 plane 1.  It is I<not> compatible
-to normal encodings; it had never been registered by any standards bodies.
+C<x-iso-2022-jp-2004-strict> uses JIS X 0208 as much as possible,
+strictly confirming JIS X 0213:2004.
+It is compatible to other encodings.
+
+C<x-iso-2022-jp-2004-compatible> uses JIS X 0208 for the bit combinations
+co-existing on JIS X 0208 and JIS X 0213 plane 1.
+It is I<not> compatible to other encodings;
+it had never been registered by any standards bodies.
+
+However, all encodings above
+perform C<-compatible> behavior to decode byte strings.
+Exception is C<x-iso-2022-jp-2004-strict>:
+it accepts only allowed JIS X 0208 sequences.
 
 =head1 SEE ALSO
 

@@ -5,8 +5,9 @@ use ExtUtils::MakeMaker;
 
 my %tables = (
     raw_t => [
-	qw(jis-x-0208.ucm jis-x-0213-plane1-2000.ucm
-	jis-x-0213-plane1.ucm jis-x-0213-plane2.ucm)
+	qw(jis-x-0208.ucm jis-x-0208-0213.ucm
+	jis-x-0213-plane1-2000.ucm jis-x-0213-plane1.ucm
+	jis-x-0213-plane2.ucm)
     ],
     sjis_t => [qw(shift_jis-2004.ucm)],
 );
@@ -70,7 +71,7 @@ WriteMakefile(
     },
     PREREQ_PM     => {
         'Encode'              => '2.12',
-        'Encode::ISO2022'     => 0,
+        'Encode::ISO2022'     => '0.02',
     },
     META_MERGE    => {
         resources     => {

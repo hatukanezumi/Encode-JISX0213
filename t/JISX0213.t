@@ -2,8 +2,7 @@
 #-*- coding: us-ascii -*-
 
 use strict;
-use Test::More tests => 36;
-#use Test::More qw(no_plan);
+use Test::More tests => 45;
 
 use Encode;
 use_ok('Encode::JISX0213');
@@ -15,11 +14,15 @@ our $DEBUG = shift || 0;
 
 my %Charset =
     (
-     'x0213-1-ascii' => [qw(euc-jis-2004 shift_jis-2004 iso-2022-jp-2004)],
-     'x0213-1-compatible' => [qw(iso-2022-jp-2004-compatible)],
-     'x0213-2' => [qw(euc-jis-2004 shift_jis-2004 iso-2022-jp-2004
-	euc-jisx0213 iso-2022-jp-3)],
-     'x0213-2000-1-ascii' => [qw(euc-jisx0213 iso-2022-jp-3)],
+	'x0213-1-ascii' => [qw(euc-jis-2004 shift_jis-2004 iso-2022-jp-2004)],
+	'x0213-1-compatible' => [qw(iso-2022-jp-2004-compatible)],
+	'x0213-1-strict' => [qw(iso-2022-jp-2004-strict)],
+	'x0213-2' => [
+	    qw(euc-jis-2004 shift_jis-2004 iso-2022-jp-2004
+	    iso-2022-jp-2004-compatible iso-2022-jp-2004-strict
+	    euc-jisx0213 iso-2022-jp-3)
+	],
+	'x0213-2000-1-ascii' => [qw(euc-jisx0213 iso-2022-jp-3)],
     );
 
 my $dir = dirname(__FILE__);
@@ -33,7 +36,7 @@ for my $charset (sort keys %Charset){
     my $src_enc = File::Spec->catfile($dir, "$charset.enc");
     $src_enc =~ s/-ascii(.*?)$/$1/;
     my $src_utf = File::Spec->catfile($dir, "$charset.utf");
-    $src_utf =~ s/-compatible(.*?)$/-ascii$1/;
+    $src_utf =~ s/-(?:compatible|strict)(.*?)$/-ascii$1/;
     my $dst_enc = File::Spec->catfile($dir, "$$.enc");
     my $dst_utf = File::Spec->catfile($dir, "$$.utf");
 

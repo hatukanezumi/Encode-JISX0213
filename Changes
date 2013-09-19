@@ -1,14 +1,25 @@
 Revision history for Perl extension Encode-JISX0213.
 
+0.01_02  Wed Sep 18 2013
+
+	* jis-x-0208.ucm: removed fallback maps for CP932, except U+2015 which
+	  is defined by jis0208-raw encoding of Encode core module.
+	* JISX0213.pm:
+	  - Introduced shortest encoding strategy for secondary CCS of
+	    iso-2022-* encodings.
+	  - Canonical name of "iso-2022-jp-2004-compatible" was renamed to
+	    "x-iso-2022-jp-2004-compatible".
+	  - Added "x-iso-2022-jp-2004-strict" encoding.
+
 0.01_00  Tue Sep 17 2013
 
-    * First beta.
+	* First beta.
 
 0.000_07  Sun Sep 15 2013
 
-    * Second CPAN upload.
+	* Second CPAN upload.
 
 0.000_06  Sun Sep 15 2013
 
-    * First CPAN upload.
+	* First CPAN upload.
 

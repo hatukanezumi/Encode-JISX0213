@@ -17,7 +17,7 @@ my $RETURN_ON_ERR = Encode::RETURN_ON_ERR();
 my $WARN_ON_ERR = Encode::WARN_ON_ERR();
 
 foreach my $encoding (
-    qw/jis-x-0208 jis-x-0213-plane1 jis-x-0213-plane1-2000/
+    qw/jis-x-0208 jis-x-0208-0213 jis-x-0213-plane1 jis-x-0213-plane1-2000/
 ) {
     foreach my $alt ('', 'ascii', 'jis') {
 	my $name = $encoding . ($alt ? "-$alt" : "");
@@ -202,6 +202,10 @@ This module provides followng coded character sets.
        jis-x-0213-plane1-2000-ascii
        jis-x-0213-plane1-2000-jis
   229  jis-x-0213-plane2       JIS X 0213:2000/2004 level 4 (plane 2)
+
+   -   jis-x-0208-0213         Common set of JIS X 0208 and JIS X 0213
+       jis-x-0208-0213-ascii
+       jis-x-0208-0213-jis
   ----------------------------------------------------------------
 
 =head1 DESCRIPTION
