@@ -71,7 +71,7 @@ WriteMakefile(
     },
     PREREQ_PM     => {
         'Encode'              => '2.12',
-        'Encode::ISO2022'     => '0.02',
+        'Encode::ISO2022'     => '0.03',
     },
     META_MERGE    => {
         resources     => {
