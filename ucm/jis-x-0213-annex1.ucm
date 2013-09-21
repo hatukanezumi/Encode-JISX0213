@@ -12,7 +12,7 @@
 # * \xFC\x5A have a fallback mapping from U+9B1D which was allocated by
 #   JIS X 0213:2000.
 #
-<code_set_name>  "shift_jis-2004"
+<code_set_name>  "jis-x-0213-annex1"
 <mb_cur_min> 1
 <mb_cur_max> 2
 <subchar> \x81\xAC

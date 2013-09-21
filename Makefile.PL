@@ -1,6 +1,10 @@
+#-*- perl -*-
+#-*- coding: us-ascii -*-
+
 use 5.7.2;
 use strict;
 use warnings;
+use Config;
 use ExtUtils::MakeMaker;
 
 my %tables = (
@@ -9,7 +13,7 @@ my %tables = (
 	jis-x-0213-plane1-2000.ucm jis-x-0213-plane1.ucm
 	jis-x-0213-plane2.ucm)
     ],
-    sjis_t => [qw(shift_jis-2004.ucm)],
+    sjis_t => [qw(jis-x-0213-annex1.ucm)],
 );
 
 unless ($ENV{AGGREGATE_TABLES}) {
@@ -28,11 +32,17 @@ unless ($ENV{AGGREGATE_TABLES}) {
 }
 
 my ($enc2xs, $encode_h) = ('enc2xs', '.');
+my @path_ext = ('');
+@path_ext = split(';', $ENV{PATHEXT}) if $^O eq 'MSWin32';
 PATHLOOP:
-for my $d (split /:/, $ENV{PATH}) {
-    for my $f (qw/enc2xs enc2xs5.7.3/) {
-	my $path = File::Spec->catfile($d, $f);
-	-x $path and $enc2xs = $path and last PATHLOOP;
+for my $d (@Config{qw/bin sitebin vendorbin/},
+        (split /$Config{path_sep}/o, $ENV{PATH})){
+    for my $f (qw/enc2xs enc2xs5.7.3/){
+        my $path = File::Spec->catfile($d, $f);
+        for my $ext (@path_ext) {
+            my $bin = "$path$ext";
+            -r "$bin" and $enc2xs = $bin and last PATHLOOP;
+        }
     }
 }
 $enc2xs or die "enc2xs not found!";

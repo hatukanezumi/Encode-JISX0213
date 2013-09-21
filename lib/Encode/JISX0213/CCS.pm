@@ -15,23 +15,10 @@ XSLoader::load('Encode::JISX0213', $VERSION);
 my $err_encode_nomap = '"\x{%*v04X}" does not map to %s';
 
 my $DIE_ON_ERR = Encode::DIE_ON_ERR();
+my $FB_QUIET = Encode::FB_QUIET();
 my $LEAVE_SRC = Encode::LEAVE_SRC();
 my $RETURN_ON_ERR = Encode::RETURN_ON_ERR();
 my $WARN_ON_ERR = Encode::WARN_ON_ERR();
-
-foreach my $encoding (
-    qw/jis-x-0208 jis-x-0208-0213 jis-x-0213-plane1 jis-x-0213-plane1-2000/
-) {
-    foreach my $alt ('', 'ascii', 'jis') {
-	my $name = $encoding . ($alt ? "-$alt" : "");
-	$Encode::Encoding{$name} = bless {
-	    Name => $name,
-	    alt => $alt,
-	    encoding => $Encode::Encoding{"$encoding-canonic"},
-	    jisx0213 => ($name =~ /jis-x-0213/ ? 1 : 0),
-	} => __PACKAGE__;
-    }
-}
 
 # Workaround for encengine.c which cannot correctly map Unicode sequence
 # with multiple characters.
@@ -66,119 +53,134 @@ my %composed = (
     "\x{02E9}\x{02E5}" => "\x2B\x65",
     "\x{02E5}\x{02E9}" => "\x2B\x66",
 );
+my $composed         = join '|', reverse sort keys %composed;
+my $composed_legacy  = '.[\x{0300}-\x{036F}\x{309A}]';
+my $prohibited_ascii = '[\x21-\x7E]';
+my $prohibited_jis   = '[\x21-\x5B\x{00A5}\x5D-\x7D\x{203E}]';
+
+foreach my $encoding (
+    qw/jis-x-0208 jis-x-0208-0213 jis-x-0213-plane1 jis-x-0213-plane1-2000/
+) {
+    foreach my $alt ('', 'ascii', 'jis') {
+	my $name = $encoding . ($alt ? "-$alt" : "");
+	my $jisx0213 = ($name =~ /jis-x-0213/) ? 1 : 0;
+
+	my $regexp;
+	unless ($jisx0213) {
+	    if ($alt eq 'ascii') {
+		$regexp = qr{
+		    \A (.*?) ($composed_legacy | $prohibited_ascii | \z)
+		}osx;
+	    } elsif ($alt eq 'jis') {
+		$regexp = qr{
+		    \A (.*?) ($composed_legacy | $prohibited_jis | \z)
+		}osx;
+	    } else {
+		$regexp = qr{
+		    \A (.*?) ($composed_legacy | \z)
+		}osx;
+	    }
+	} else {
+	    if ($alt eq 'ascii') {
+		$regexp = qr{\A (.*?) ($composed | $prohibited_ascii | \z)}osx;
+	    } elsif ($alt eq 'jis') {
+		$regexp = qr{\A (.*?) ($composed | $prohibited_jis | \z)}osx;
+	    } else {
+		$regexp = qr{\A (.*?) ($composed | \z)}osx;
+	    }
+	}
+
+	$Encode::Encoding{$name} = bless {
+	    Name => $name,
+	    alt => $alt,
+	    encoding => $Encode::Encoding{"$encoding-canonic"},
+	    jisx0213 => $jisx0213,
+	    regexp => $regexp,
+	} => __PACKAGE__;
+    }
+}
 
 # substitution cacharcter for multibyte.
 my $subChar = "\x22\x2E"; # GETA MARK
 
 sub encode {
     my ($self, $utf8, $chk) = @_;
+    $chk ||= 0;
 
-    # Workaround for built-in "best effort" encoding: it cannot handle
-    # multibyte subchar; its PERLQQ, HTMLCREF and XMLCREF scheme are useless.
     my $chk_sub;
     if (ref $chk eq 'CODE') {
 	$chk_sub = $chk;
 	$chk = $LEAVE_SRC;
-    } elsif ($chk & ($DIE_ON_ERR | $RETURN_ON_ERR)) {
-	$chk_sub = $chk & ~$LEAVE_SRC;
-    } elsif ($chk & ($WARN_ON_ERR)) {
-	$chk_sub = sub {
-	    carp sprintf $err_encode_nomap, '}\x{', chr(shift), $self->{Name};
-	    $subChar;
-	};
-    } else {
-	$chk_sub = sub { $subChar };
     }
+    my $regexp = $self->{regexp};
 
-    my $conv = '';
-    my $residue = '';
+    my $str = '';
 
-  ENCODE_LOOP:
-    if ($self->{alt} eq 'ascii' and $utf8 =~ s/([\x21-\x7E].*)$//s or
-	$self->{alt} eq 'jis' and
-	$utf8 =~ s/([\x21-\x5B\x{00A5}\x5D-\x7D\x{203E}].*)$//s) {
-	$residue = $1;
-	if ($chk & $DIE_ON_ERR) {
-	    croak sprintf $err_encode_nomap, '}\x{',
-		substr($residue, 0, 1), $self->{Name};
-	}
-    }
+  CHUNKS:
+    while ($utf8 =~ /./os) {
+	my $errChar = undef;
 
-    unless ($self->{jisx0213}) {
-	# JIS X 0208
-	if ($utf8 =~ s/(.[\x{0300}-\x{036F}\x{309A}].*)$//s) {
-	    $residue = $1 . $residue;
-	}
-	$conv .= $self->{encoding}->encode($utf8, $chk_sub);
-    } else {
-	# JIS X 0213
-	while ($utf8 =~
-	   s{  \A
-		(.*?)
-		(
-		    \x{02E9} \x{02E5} |
-		    \x{02E5} \x{02E9} |
-		    . [\x{0300}\x{0301}\x{309A}] |
-		    [\x{02E5}\x{02E9}\x{0300}\x{0301}] |
-		    \z
-		)
-	    }{}sx
-	) {
+	while ($utf8 =~ s/$regexp//) {
 	    my ($chunk, $mc) = ($1, $2);
-	    last unless length $chunk or length $mc;
+	    last CHUNKS unless $chunk =~ /./os or $mc =~ /./os;
 
-	    if (length $chunk) {
-		$conv .= $self->{encoding}->encode($chunk, $chk_sub);
+	    if ($chunk =~ /./os) {
+		$str .= $self->{encoding}->encode($chunk, $FB_QUIET);
 	    }
-	    if (length $chunk) {
+	    if ($chunk =~ /./os) {
 		$utf8 = $chunk . $mc . $utf8;
 		last;
 	    }
 
-	    next unless length $mc;
-	    if ($composed{$mc}) {
-		$conv .= $composed{$mc};
+	    unless ($mc =~ /./os) {
 		next;
-	    }
-	    $conv .= $self->{encoding}->encode($mc, $chk_sub);
-	    if (length $mc) {
+	    } elsif ($self->{jisx0213} and $composed{$mc}) {
+		$str .= $composed{$mc};
+		next;
+	    } else {
+		$errChar = $mc;
 		$utf8 = $mc . $utf8;
 		last;
 	    }
 	}
-    }
 
-    if (not length $utf8 and length $residue) {
-	my $errChar = substr($residue, 0, 1);
+	$errChar = substr($utf8, 0, 1) unless defined $errChar;
 
-	if (($chk & $WARN_ON_ERR) and ($chk & $RETURN_ON_ERR)) {
+	if ($chk & $DIE_ON_ERR) {
+	    croak sprintf $err_encode_nomap, '}\x{', $errChar, $self->{Name};
+	}
+	if ($chk & $WARN_ON_ERR) {
 	    carp sprintf $err_encode_nomap, '}\x{', $errChar, $self->{Name};
 	}
-	unless ($chk & $RETURN_ON_ERR) {
-	    $conv .= $chk_sub->(ord $errChar);
-
-	    substr($residue, 0, 1) = '';
-	    ($utf8, $residue) = ($residue, '');
-	    goto ENCODE_LOOP;
+	if ($chk & $RETURN_ON_ERR) {
+	    last CHUNKS;
 	}
-    }
 
-    $_[1] = $utf8 . $residue unless $chk & $LEAVE_SRC;
-    return $conv;
+	if ($chk_sub) {
+	    $str .= join '', map { $chk_sub->(ord $_) } split //, $errChar;
+	} else {
+	    $str .= $subChar;
+	}
+	substr($utf8, 0, length $errChar) = '';
+    } # CHUNKS
+
+    $_[1] = $utf8 unless $chk & $LEAVE_SRC;
+    return $str;
 }
 
 sub decode {
     my ($self, $str, $chk) = @_;
+    $chk ||= 0;
 
-    my $conv = $self->{encoding}->decode($str, $chk);
+    my $utf8 = $self->{encoding}->decode($str, $chk);
     if ($self->{alt} eq 'ascii') {
-	$conv =~ tr/\x21-\x7E/\x{FF01}-\x{FF5E}/;
+	$utf8 =~ tr/\x21-\x7E/\x{FF01}-\x{FF5E}/;
     } elsif ($self->{alt} eq 'jis') {
-	$conv =~ tr/\x21-\x5B\x{00A5}\x5D-\x7D\x{203E}/\x{FF01}-\x{FF3B}\x{FFE5}\x{FF3D}-\x{FF5D}\x{FFE3}/;
+	$utf8 =~ tr/\x21-\x5B\x{00A5}\x5D-\x7D\x{203E}/\x{FF01}-\x{FF3B}\x{FFE5}\x{FF3D}-\x{FF5D}\x{FFE3}/;
     }
 
-    $_[1] = $str;
-    return $conv;
+    $_[1] = $str unless $chk & $LEAVE_SRC;
+    return $utf8;
 }
 
 1;

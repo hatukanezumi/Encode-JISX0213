@@ -264,8 +264,6 @@ __PACKAGE__->Define(
     SubChar => "\x{3013}",
 );
 
-Encode::define_alias(qr/\bshift.*jis.*2004$/, '"shift_jis-2004"');
-
 1;
 __END__
 
@@ -288,12 +286,12 @@ This module provides following encodings.
 
   Canonical         Alias                         Description
   --------------------------------------------------------------
-  euc-jis-2004      qr/\beuc-?(jis|jp)-?2004$/i   EUC encoding
-  iso-2022-jp-2004  qr/\biso-?2022-?jp-?2004$/i   7-bit encoding
-  shift_jis-2004    qr/\bshift.*jis.*2004$/i      "shift" encoding
+  euc-jis-2004      qr/\beuc-?(jis|jp)-?2004$/i   8 bit encoding
+  iso-2022-jp-2004  qr/\biso-?2022-?jp-?2004$/i   7 bit encoding
   --------------------------------------------------------------
+  Note: About "shift encoding" see Encode::ShiftJIS2004.
 
-For older release of JIS X 0213:
+Additionally, for older revision of JIS X 0213:
 
   Canonical         Alias                         Description
   --------------------------------------------------------------
@@ -304,7 +302,7 @@ For older release of JIS X 0213:
   iso-2022-jp-3     qr/\biso-?2022-?jp-?3$/i      JIS X 0213:2000
   --------------------------------------------------------------
 
-For transition from legacy standards:
+and for transition from legacy standards:
 
   Canonical         Alias                         Description
   --------------------------------------------------------------
@@ -321,7 +319,7 @@ To find out how to use this module in detail, see L<Encode>.
 =head2 Note on Variants
 
 C<x-iso-2022-jp-2004-strict> uses JIS X 0208 as much as possible,
-strictly confirming JIS X 0213:2004.
+strictly conforming to JIS X 0213:2004 Annex 2.
 It is compatible to other encodings.
 
 C<x-iso-2022-jp-2004-compatible> uses JIS X 0208 for the bit combinations
@@ -329,10 +327,10 @@ co-existing on JIS X 0208 and JIS X 0213 plane 1.
 It is I<not> compatible to other encodings;
 it had never been registered by any standards bodies.
 
-However, all encodings above
+However, encodings above
 perform C<-compatible> behavior to decode byte strings.
 Exception is C<x-iso-2022-jp-2004-strict>:
-it accepts only allowed JIS X 0208 sequences.
+It accepts only allowed JIS X 0208 sequences.
 
 =head1 SEE ALSO
 
@@ -341,7 +339,7 @@ I<7ビット及び8ビットの2バイト情報交換用符号化拡張漢字集
 (I<7-bit and 8-bit double byte coded extended KANJI sets for information
 interchange>), and its amendment JIS X 0213:2000/AMENDMENT 1:2004.
 
-L<Encode>, L<Encode::JP>, L<Encode::ISO2022JP2>.
+L<Encode>, L<Encode::JP>, L<Encode::ShiftJIS2004>.
 
 =head1 AUTHOR
 

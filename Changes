@@ -1,5 +1,11 @@
 Revision history for Perl extension Encode-JISX0213.
 
+0.01_04  Sat Sep 21 2013
+
+	* Supported enc2xs.bat for MSWin32
+	* Fixed broken encoding by shift_jis-2004: Now it is provied by
+	  separate package Encode::ShiftJIS2004.
+
 0.01_02  Wed Sep 18 2013
 
 	* jis-x-0208.ucm: removed fallback maps for CP932, except U+2015 which

@@ -16,7 +16,7 @@ t/x0213-2000-1-ascii.utf
 t/x0213-2000-1.enc
 ucm/jis-x-0208.ucm
 ucm/jis-x-0208-0213.ucm
+ucm/jis-x-0213-annex1.ucm
 ucm/jis-x-0213-plane1-2000.ucm
 ucm/jis-x-0213-plane1.ucm
 ucm/jis-x-0213-plane2.ucm
-ucm/shift_jis-2004.ucm

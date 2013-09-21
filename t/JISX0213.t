@@ -2,10 +2,11 @@
 #-*- coding: us-ascii -*-
 
 use strict;
-use Test::More tests => 45;
+use Test::More tests => 46;
 
 use Encode;
 use_ok('Encode::JISX0213');
+use_ok('Encode::ShiftJIS2004');
 
 use File::Basename;
 use File::Spec;
