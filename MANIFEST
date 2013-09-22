@@ -1,11 +1,15 @@
 Changes
 lib/Encode/JISX0213.pm
 lib/Encode/JISX0213/CCS.pm
+lib/Encode/ShiftJIS2004.pm
 Makefile.PL
 MANIFEST			This list of files
 README
 t/JISX0213.t
 t/pod.t
+t/shift_jis.enc
+t/shift_jis.t
+t/shift_jis.utf
 t/x0213-1-ascii.utf
 t/x0213-1-compatible.enc
 t/x0213-1.enc

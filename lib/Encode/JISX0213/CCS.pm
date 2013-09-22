@@ -105,7 +105,6 @@ my $subChar = "\x22\x2E"; # GETA MARK
 
 sub encode {
     my ($self, $utf8, $chk) = @_;
-    $chk ||= 0;
 
     my $chk_sub;
     if (ref $chk eq 'CODE') {
@@ -170,7 +169,6 @@ sub encode {
 
 sub decode {
     my ($self, $str, $chk) = @_;
-    $chk ||= 0;
 
     my $utf8 = $self->{encoding}->decode($str, $chk);
     if ($self->{alt} eq 'ascii') {

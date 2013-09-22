@@ -1,6 +1,6 @@
 Revision history for Perl extension Encode-JISX0213.
 
-0.01_04  Sat Sep 21 2013
+0.01_05  Sun Sep 22 2013
 
 	* Supported enc2xs.bat for MSWin32
 	* Fixed broken encoding by shift_jis-2004: Now it is provied by
