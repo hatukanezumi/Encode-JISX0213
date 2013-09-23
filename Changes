@@ -1,5 +1,9 @@
 Revision history for Perl extension Encode-JISX0213.
 
+0.02  Mon Sep 23 2013
+
+	* First stable (hopefully) release.
+
 0.01_05  Sun Sep 22 2013
 
 	* Supported enc2xs.bat for MSWin32

@@ -7,13 +7,14 @@
 #
 # * 91 fallback mappings (|1) for alternative names described in Annex 5
 #   table 2, a.k.a. fullwidth forms, are added.
-# * One more fallback mapping (|1) for FULLWIDTH REVERSE SOLIDUS which is not
-#   listed in the table described above is added.
-# * A fallback mapping (|1) for HORIZONTAL BAR which is mapped by jis0208-raw
-#   encoding of Encode core module.
+# * One more fallback mapping (|1) for FULLWIDTH REVERSE SOLIDUS is added.
+#   It is not listed in the table described above but listed in JIS X 0213
+#   Annex 5 table 2.
 #
 # About difference from Microsoft Code Page 932.
 #
+# * A fallback mapping (|1) for HORIZONTAL BAR which is mapped by jis0208-raw
+#   encoding of Encode core module is added.
 # * Following code points are not added because they are mapped by JIS X 0213
 #   (partly alternative names):
 #   1-33 (\x21\x41) from U+FF5E FULLWIDTH TILDE        [2000] 1-2-18 (alt.)

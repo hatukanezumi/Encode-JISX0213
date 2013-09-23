@@ -7,9 +7,9 @@ MANIFEST			This list of files
 README
 t/JISX0213.t
 t/pod.t
-t/shift_jis.enc
-t/shift_jis.t
-t/shift_jis.utf
+t/shiftjis2004.enc
+t/ShiftJIS2004.t
+t/shiftjis2004.utf
 t/x0213-1-ascii.utf
 t/x0213-1-compatible.enc
 t/x0213-1.enc

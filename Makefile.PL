@@ -68,19 +68,18 @@ close $pm_file;
 my $name = 'JISX0213';
 
 WriteMakefile(
-    INC     => "-I$encode_h",
-    NAME    => 'Encode::' . $name,
-    VERSION_FROM => 'lib/Encode/JISX0213.pm',
+    INC           => "-I$encode_h",
+    NAME          => 'Encode::' . $name,
+    VERSION_FROM  => 'lib/Encode/JISX0213.pm',
     ABSTRACT_FROM => 'lib/Encode/JISX0213.pm',
     AUTHOR        => 'Hatuka*nezumi - IKEDA Soji <hatuka@nezumi.nu>',
     LICENSE       => 'perl',
-    CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 0,},
+    CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => 0, },
     BUILD_REQUIRES     => {
         'ExtUtils::MakeMaker' => 0,
         'Test::More'          => 0,
     },
     PREREQ_PM     => {
-        'Encode'              => '2.12',
         'Encode::ISO2022'     => '0.03',
     },
     META_MERGE    => {

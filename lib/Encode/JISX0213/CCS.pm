@@ -6,7 +6,7 @@ package Encode::JISX0213::CCS;
 use strict;
 use warnings;
 use base qw(Encode::Encoding);
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp qw(carp croak);
 use XSLoader;
@@ -16,9 +16,12 @@ my $err_encode_nomap = '"\x{%*v04X}" does not map to %s';
 
 my $DIE_ON_ERR = Encode::DIE_ON_ERR();
 my $FB_QUIET = Encode::FB_QUIET();
+my $HTMLCREF = Encode::HTMLCREF();
 my $LEAVE_SRC = Encode::LEAVE_SRC();
+my $PERLQQ = Encode::PERLQQ();
 my $RETURN_ON_ERR = Encode::RETURN_ON_ERR();
 my $WARN_ON_ERR = Encode::WARN_ON_ERR();
+my $XMLCREF = Encode::XMLCREF();
 
 # Workaround for encengine.c which cannot correctly map Unicode sequence
 # with multiple characters.
@@ -54,7 +57,7 @@ my %composed = (
     "\x{02E5}\x{02E9}" => "\x2B\x66",
 );
 my $composed         = join '|', reverse sort keys %composed;
-my $composed_legacy  = '.[\x{0300}-\x{036F}\x{309A}]';
+my $composed_legacy  = '[^\x00-\x1F\x7F-\x9F][\x{0300}-\x{036F}\x{309A}]+';
 my $prohibited_ascii = '[\x21-\x7E]';
 my $prohibited_jis   = '[\x21-\x5B\x{00A5}\x5D-\x7D\x{203E}]';
 
@@ -125,10 +128,10 @@ sub encode {
 
 	    if ($chunk =~ /./os) {
 		$str .= $self->{encoding}->encode($chunk, $FB_QUIET);
-	    }
-	    if ($chunk =~ /./os) {
-		$utf8 = $chunk . $mc . $utf8;
-		last;
+		if ($chunk =~ /./os) {
+		    $utf8 = $chunk . $mc . $utf8;
+		    last;
+		}
 	    }
 
 	    unless ($mc =~ /./os) {
@@ -170,6 +173,9 @@ sub encode {
 sub decode {
     my ($self, $str, $chk) = @_;
 
+    if ($self->{alt} and not ref $chk) {
+	$chk &= ~($PERLQQ | $XMLCREF | $HTMLCREF);
+    }
     my $utf8 = $self->{encoding}->decode($str, $chk);
     if ($self->{alt} eq 'ascii') {
 	$utf8 =~ tr/\x21-\x7E/\x{FF01}-\x{FF5E}/;
@@ -180,6 +186,8 @@ sub decode {
     $_[1] = $str unless $chk & $LEAVE_SRC;
     return $utf8;
 }
+
+sub perlio_ok { 0 }
 
 1;
 __END__
@@ -220,6 +228,15 @@ see L<Encode> and L<Encode::ISO2022>.
 
 Those suffixed "-ascii" and "-jis" use alternative names for the characters
 compatible to ISO/IEC 646 IRV and JIS X 0201 Latin set, respectively.
+
+=head2 Compatibility
+
+C<jis-x-0208*> include a fallback mapping for HORIZONTAL BAR.
+Though it is not normative mapping defined by JIS X 0208,
+it is added for compatibility to C<jis0208-raw> encoding in L<Encode::JP>
+core module.
+
+However, C<jis-x-0208-0213*> no longer include this mapping.
 
 =head1 SEE ALSO
 

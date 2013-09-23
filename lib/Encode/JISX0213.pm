@@ -6,7 +6,7 @@ package Encode::JISX0213;
 use strict;
 use warnings;
 use base qw(Encode::ISO2022);
-our $VERSION = '0.01_05';
+our $VERSION = '0.02';
 
 use Encode::ISOIRSingle;
 use Encode::JISLegacy;
@@ -144,7 +144,7 @@ __PACKAGE__->Define(
 
 __PACKAGE__->Define(
     Alias => qr/\biso-?2022-?jp-?2004-?strict$/i,
-    Name  => 'x-iso-2022-jp-2004-strict',
+    Name  => 'x-iso2022jp2004-strict',
     CCS   => [
 	{   cl       => 1,
 	    encoding => 'ascii',
@@ -187,7 +187,7 @@ __PACKAGE__->Define(
 
 __PACKAGE__->Define(
     Alias => qr/\biso-?2022-?jp-?2004-?compatible$/i,
-    Name  => 'x-iso-2022-jp-2004-compatible',
+    Name  => 'x-iso2022jp2004-compatible',
     CCS   => [
 	{   cl       => 1,
 	    encoding => 'ascii',
@@ -264,6 +264,8 @@ __PACKAGE__->Define(
     SubChar => "\x{3013}",
 );
 
+sub needs_lines { 1 }
+
 1;
 __END__
 
@@ -286,29 +288,36 @@ This module provides following encodings.
 
   Canonical         Alias                         Description
   --------------------------------------------------------------
-  euc-jis-2004      qr/\beuc-?(jis|jp)-?2004$/i   8 bit encoding
-  iso-2022-jp-2004  qr/\biso-?2022-?jp-?2004$/i   7 bit encoding
+  euc-jis-2004      qr/\beuc-?(jis|jp)-?2004$/i   8-bit encoding
+  iso-2022-jp-2004  qr/\biso-?2022-?jp-?2004$/i   7-bit encoding
   --------------------------------------------------------------
-  Note: About "shift encoding" see Encode::ShiftJIS2004.
 
-Additionally, for older revision of JIS X 0213:
+=over
+
+=item *
+
+About "shift encoding" see L<Encode::ShiftJIS2004>.
+
+=back
+
+Additionally, for older revision, JIS X 0213:2000:
 
   Canonical         Alias                         Description
   --------------------------------------------------------------
-  euc-jisx0213      qr/\beucjisx0213$/i           JIS X 0213:2000
+  euc-jisx0213      qr/\beucjisx0213$/i           8-bit encoding
                     qr/\beuc.*jp[ \-]?(?:2000|2k)$/i
                     qr/\bjp.*euc[ \-]?(2000|2k)$/i
                     qr/\bujis[ \-]?(?:2000|2k)$/i
-  iso-2022-jp-3     qr/\biso-?2022-?jp-?3$/i      JIS X 0213:2000
+  iso-2022-jp-3     qr/\biso-?2022-?jp-?3$/i      7-bit encoding
   --------------------------------------------------------------
 
 and for transition from legacy standards:
 
   Canonical         Alias                         Description
   --------------------------------------------------------------
-  x-iso-2022-jp-2004-compatible                   See note.
+  x-iso2022jp2004-compatible                     See note.
                     qr/\biso-?2022-?jp-?2004-?compatible$/i
-  x-iso-2022-jp-2004-strict                       See note.
+  x-iso2022jp2004-strict                         See note.
                     qr/\biso-?2022-?jp-?2004-?strict$/i
   --------------------------------------------------------------
 
@@ -318,18 +327,18 @@ To find out how to use this module in detail, see L<Encode>.
 
 =head2 Note on Variants
 
-C<x-iso-2022-jp-2004-strict> uses JIS X 0208 as much as possible,
+C<x-iso2022jp2004-strict> uses JIS X 0208 as much as possible,
 strictly conforming to JIS X 0213:2004 Annex 2.
 It is compatible to other encodings.
 
-C<x-iso-2022-jp-2004-compatible> uses JIS X 0208 for the bit combinations
+C<x-iso2022jp2004-compatible> uses JIS X 0208 for the bit combinations
 co-existing on JIS X 0208 and JIS X 0213 plane 1.
 It is I<not> compatible to other encodings;
 it had never been registered by any standards bodies.
 
-However, encodings above
+However, encodings in the tables above
 perform C<-compatible> behavior to decode byte strings.
-Exception is C<x-iso-2022-jp-2004-strict>:
+Exception is C<x-iso2022jp2004-strict>:
 It accepts only allowed JIS X 0208 sequences.
 
 =head1 SEE ALSO
@@ -337,7 +346,8 @@ It accepts only allowed JIS X 0208 sequences.
 JIS X 0213:2000
 I<7ビット及び8ビットの2バイト情報交換用符号化拡張漢字集合>
 (I<7-bit and 8-bit double byte coded extended KANJI sets for information
-interchange>), and its amendment JIS X 0213:2000/AMENDMENT 1:2004.
+interchange>),
+and its amendment JIS X 0213:2000/Amd.1:2004.
 
 L<Encode>, L<Encode::JP>, L<Encode::ShiftJIS2004>.
 

@@ -6,7 +6,7 @@ package Encode::ShiftJIS2004;
 use strict;
 use warnings;
 use base qw(Encode::Encoding);
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp qw(carp croak);
 use Encode::JISX0213::CCS;
@@ -63,6 +63,7 @@ my %composed = (
     "\x{02E5}\x{02E9}" => "\x86\x86",
 );
 my $composed_re = join '|', reverse sort keys %composed;
+my $regexp = qr{\A (.*?) ($composed_re | \z)}osx;
 
 # substitution cacharcter for multibyte.
 my $subChar = "\x81\xAC"; # GETA MARK
@@ -81,9 +82,7 @@ sub encode {
 
   CHUNKS:
     while ($utf8 =~ /./os) {
-	while ($utf8 =~
-	   s{ \A (.*?) ( $composed_re | \z ) }{}osx
-	) {
+	while ($utf8 =~ s/$regexp//) {
 	    my ($chunk, $mc) = ($1, $2);
 	    last CHUNKS unless $chunk =~ /./os or $mc =~ /./os;
 
@@ -136,6 +135,8 @@ sub decode {
     return $utf8;
 }
 
+sub mime_name { uc(shift->{Name}) }
+
 1;
 __END__
 
@@ -143,13 +144,20 @@ __END__
 
 Encode::ShiftJIS2004 - shift_jis-2004 - JIS X 0213 Annex 1 encoding
 
+=head1 SYNOPSIS
+
+  use Encode::ShiftJIS2004;
+  use Encode qw/encode decode/;
+  $bytes = encode("shift_jis-2004", $utf8);
+  $utf8 = decode("shift_jis-2004", $bytes);
+
 =head1 ABSTRACT
 
-This module provides followng encoding.
+This module provides followng encoding for JIS X 0213:2004 Annex 1.
 
   Canonical         Alias                         Description
   --------------------------------------------------------------
-  shift_jis-2004    qr/\bshift.*jis.*2004$/i      "shift" encoding
+  shift_jis-2004    qr/\bshift.*jis.*2004$/i      shift encoding
   --------------------------------------------------------------
 
 =head1 DESCRIPTION

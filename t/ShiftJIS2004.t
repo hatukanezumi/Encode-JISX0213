@@ -10,11 +10,11 @@ use Test::More tests => 3;
 
 BEGIN { use_ok('Encode::ShiftJIS2004') };
 
-my $charset = 'shift_jis-2004';
+my $charset = 'shift jis 2004';
 
 my $dir = dirname(__FILE__);
-my $src_enc = File::Spec->catfile($dir,"shift_jis.enc");
-my $src_utf = File::Spec->catfile($dir,"shift_jis.utf");
+my $src_enc = File::Spec->catfile($dir,"shiftjis2004.enc");
+my $src_utf = File::Spec->catfile($dir,"shiftjis2004.utf");
 my $dst_enc = File::Spec->catfile($dir,"$$.enc");
 my $dst_utf = File::Spec->catfile($dir,"$$.utf");
 
