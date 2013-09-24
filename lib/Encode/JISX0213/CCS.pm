@@ -227,7 +227,8 @@ see L<Encode> and L<Encode::ISO2022>.
 =head2 Note on Variants
 
 Those suffixed "-ascii" and "-jis" use alternative names for the characters
-compatible to ISO/IEC 646 IRV and JIS X 0201 Latin set, respectively.
+compatible to ISO/IEC 646 IRV (virtually ASCII) and JIS X 0201 Latin set,
+respectively.
 
 =head2 Compatibility
 

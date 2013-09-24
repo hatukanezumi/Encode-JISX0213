@@ -1,5 +1,11 @@
 Revision history for Perl extension Encode-JISX0213.
 
+0.03  Xxx Xxx XX 2013
+
+	* t/JISX0213.t: RT tests did always succeed.
+	* ShiftJIS2004.pm: Deprecate PERLQQ feature from econde(),
+	  and added multibyte-aware error handling to decode().
+
 0.02  Mon Sep 23 2013
 
 	* First stable (hopefully) release.

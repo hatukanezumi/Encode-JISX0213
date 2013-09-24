@@ -2,7 +2,7 @@
 #-*- coding: us-ascii -*-
 
 use strict;
-use Test::More tests => 46;
+use Test::More tests => 45;
 
 use Encode;
 use_ok('Encode::JISX0213');
@@ -15,7 +15,8 @@ our $DEBUG = shift || 0;
 
 my %Charset =
     (
-	'x0213-1-ascii' => [qw(euc-jis-2004 shift_jis-2004 iso-2022-jp-2004)],
+	'x0213-1-ascii' => [qw(euc-jis-2004 iso-2022-jp-2004)],
+	#'x0213-1-jis' => [qw(euc-jis-2004 shift_jis-2004)],
 	'x0213-1-compatible' => [qw(iso-2022-jp-2004-compatible)],
 	'x0213-1-strict' => [qw(iso-2022-jp-2004-strict)],
 	'x0213-2' => [
@@ -35,7 +36,7 @@ for my $charset (sort keys %Charset){
     my $transcoder = Encode::find_encoding($Charset{$charset}[0]) or die;
 
     my $src_enc = File::Spec->catfile($dir, "$charset.enc");
-    $src_enc =~ s/-ascii(.*?)$/$1/;
+    $src_enc =~ s/-(?:ascii|jis)(.*?)$/$1/;
     my $src_utf = File::Spec->catfile($dir, "$charset.utf");
     $src_utf =~ s/-(?:compatible|strict)(.*?)$/-ascii$1/;
     my $dst_enc = File::Spec->catfile($dir, "$$.enc");
@@ -84,6 +85,7 @@ for my $charset (sort keys %Charset){
 	Encode::_utf8_on($uni);
     }
     close $src;
+    my $uni_orig = $uni;
 
     eval{ $txt = $transcoder->encode($uni,1) };    
     $@ and print $@;
@@ -105,9 +107,15 @@ for my $charset (sort keys %Charset){
     $seq++;
     
     for my $canon (@{$Charset{$charset}}){
-	is($uni, decode($canon, encode($canon, $uni)), 
-	   "RT/$charset/$canon");
-	$seq++;
+	$uni = $uni_orig;
+	my $uni_dec = decode($canon, encode($canon, $uni));
+	$uni = $uni_orig;
+	unless (ok($uni eq $uni_dec, "RT/$charset/$canon")) {
+	    $seq++;
+	    $DEBUG and dump_txt(Encode::encode_utf8($uni_dec), "t/$$.$seq");
+	} else {
+	    $seq++;
+	}
      }
     unlink($dst_utf, $dst_enc);
 }

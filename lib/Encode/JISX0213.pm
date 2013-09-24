@@ -6,7 +6,7 @@ package Encode::JISX0213;
 use strict;
 use warnings;
 use base qw(Encode::ISO2022);
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Encode::ISOIRSingle;
 use Encode::JISLegacy;
@@ -336,8 +336,8 @@ co-existing on JIS X 0208 and JIS X 0213 plane 1.
 It is I<not> compatible to other encodings;
 it had never been registered by any standards bodies.
 
-However, encodings in the tables above
-perform C<-compatible> behavior to decode byte strings.
+However, to decode byte strings, encodings in the tables above
+accept arbitrary sequences of both JIS X 0208 and JIS X 0213.
 Exception is C<x-iso2022jp2004-strict>:
 It accepts only allowed JIS X 0208 sequences.
 

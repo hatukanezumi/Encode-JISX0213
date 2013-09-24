@@ -6,12 +6,13 @@ package Encode::ShiftJIS2004;
 use strict;
 use warnings;
 use base qw(Encode::Encoding);
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp qw(carp croak);
 use Encode::JISX0213::CCS;
 
 my $err_encode_nomap = '"\x{%*v04X}" does not map to %s';
+my $err_decode_nomap = '%s "\x%*v02X" does not map to Unicode';
 
 my $DIE_ON_ERR = Encode::DIE_ON_ERR();
 my $FB_QUIET = Encode::FB_QUIET();
@@ -109,10 +110,9 @@ sub encode {
 	if ($chk & $RETURN_ON_ERR) {
 	    last;
 	}
+	# PERLQQ won't be suported to avoid ambiguity of "\x5C".
 	if ($chk_sub) {
 	    $str .= $chk_sub->(ord $errChar);
-	} elsif ($chk & $PERLQQ) {
-	    $str .= sprintf '\x{%04X}', ord $errChar;
 	} elsif ($chk & $XMLCREF) {
 	    $str .= sprintf '&#x%04X;', ord $errChar;
 	} elsif ($chk & $HTMLCREF) {
@@ -130,7 +130,42 @@ sub encode {
 sub decode {
     my ($self, $str, $chk) = @_;
 
-    my $utf8 = $self->{encoding}->decode($str, $chk);
+    my $chk_sub;
+    if (ref $chk eq 'CODE') {
+	$chk_sub = $chk;
+	$chk = $PERLQQ | $LEAVE_SRC;
+    }
+
+    my $utf8;
+    while (length $str) {
+	$utf8 .= $self->{encoding}->decode($str, $FB_QUIET);
+	last unless length $str;
+
+	my $errChar;
+	if ($str =~ /^([\x81-\x9F\xE0-\xFC][\x40-\x7E\x80-\xFC])/) {
+	    $errChar = $1;
+	} else {
+	    $errChar = substr($str, 0, 1);
+	}
+	if ($chk & $DIE_ON_ERR) {
+	    croak sprintf $err_decode_nomap, $self->{Name}, '\x', $errChar;
+	}
+	if ($chk & $WARN_ON_ERR) {
+	    carp sprintf $err_decode_nomap, $self->{Name}, '\x', $errChar;
+	}
+	if ($chk & $RETURN_ON_ERR) {
+	    last;
+	}
+	substr($str, 0, length $errChar) = '';
+
+	if ($chk_sub) {
+	    $utf8 .= join '', map { $chk_sub->(ord $_) } split //, $errChar;
+	} elsif ($chk & $PERLQQ) {
+	    $utf8 .= sprintf '\x%*v02X', '\x', $errChar;
+	} else {
+	    $utf8 .= '\x{FFFD}';
+	}
+    }
     $_[1] = $str unless $chk & $LEAVE_SRC;;
     return $utf8;
 }
@@ -164,6 +199,12 @@ This module provides followng encoding for JIS X 0213:2004 Annex 1.
 
 To find out how to use this module in detail,
 see L<Encode>.
+
+=head2 Note
+
+This encoding is not compatible to the encodings in L<Encode::JISX0213>.
+In particular, it lacks mapping for alternative names of two ASCII characters
+which are not listed in Annex 1 table 2.
 
 =head1 SEE ALSO
 
