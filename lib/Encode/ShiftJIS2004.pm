@@ -136,7 +136,8 @@ sub decode {
 	$chk = $PERLQQ | $LEAVE_SRC;
     }
 
-    my $utf8;
+    my $utf8 = '';
+
     while (length $str) {
 	$utf8 .= $self->{encoding}->decode($str, $FB_QUIET);
 	last unless length $str;
@@ -166,7 +167,7 @@ sub decode {
 	    $utf8 .= '\x{FFFD}';
 	}
     }
-    $_[1] = $str unless $chk & $LEAVE_SRC;;
+    $_[1] = $str unless $chk & $LEAVE_SRC;
     return $utf8;
 }
 
@@ -202,9 +203,10 @@ see L<Encode>.
 
 =head2 Note
 
-This encoding is not compatible to the encodings in L<Encode::JISX0213>.
-In particular, it lacks mapping for alternative names of two ASCII characters
-which are not listed in Annex 1 table 2.
+This encoding does not keep forward compatibility to C<ascii>
+but keeps conformance to the standard,
+C<"\x5C"> and C<"\x7E"> are mapped from/to YEN SIGN and OVERLINE;
+REVERSE SOLIDUS and TILDE are mapped to/from multibyte sequences.
 
 =head1 SEE ALSO
 

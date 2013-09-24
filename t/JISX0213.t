@@ -16,7 +16,6 @@ our $DEBUG = shift || 0;
 my %Charset =
     (
 	'x0213-1-ascii' => [qw(euc-jis-2004 iso-2022-jp-2004)],
-	#'x0213-1-jis' => [qw(euc-jis-2004 shift_jis-2004)],
 	'x0213-1-compatible' => [qw(iso-2022-jp-2004-compatible)],
 	'x0213-1-strict' => [qw(iso-2022-jp-2004-strict)],
 	'x0213-2' => [

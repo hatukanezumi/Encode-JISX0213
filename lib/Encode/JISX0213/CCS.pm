@@ -6,7 +6,7 @@ package Encode::JISX0213::CCS;
 use strict;
 use warnings;
 use base qw(Encode::Encoding);
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp qw(carp croak);
 use XSLoader;
@@ -183,7 +183,7 @@ sub decode {
 	$utf8 =~ tr/\x21-\x5B\x{00A5}\x5D-\x7D\x{203E}/\x{FF01}-\x{FF3B}\x{FFE5}\x{FF3D}-\x{FF5D}\x{FFE3}/;
     }
 
-    $_[1] = $str unless $chk & $LEAVE_SRC;
+    $_[1] = $str unless ref $chk or $chk & $LEAVE_SRC;
     return $utf8;
 }
 

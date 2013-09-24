@@ -11,6 +11,9 @@
 #   were allocated by JIS X 0213:2000.
 # * \xFC\x5A have a fallback mapping from U+9B1D which was allocated by
 #   JIS X 0213:2000.
+# * Two more fallback mappings for FULLWIDTH REVERSE SOLIDUS and
+#   FULLWIDTH TILDE are added.  They are not listed in Annex 1 table 2
+#   but in Annex 5 table 2.
 #
 <code_set_name>  "jis-x-0213-annex1"
 <mb_cur_min> 1
@@ -241,6 +244,7 @@ CHARMAP
 <U2010> \x81\x5D |0 # HYPHEN
 <UFF0F> \x81\x5E |0 # FULLWIDTH SOLIDUS
 <U005C> \x81\x5F |0 # REVERSE SOLIDUS
+<UFF3C> \x81\x5F |1 # FULLWIDTH REVERSE SOLIDUS
 <U301C> \x81\x60 |0 # WAVE DASH
 <U2016> \x81\x61 |0 # DOUBLE VERTICAL LINE
 <UFF5C> \x81\x62 |0 # FULLWIDTH VERTICAL LINE
@@ -321,6 +325,7 @@ CHARMAP
 <UFF02> \x81\xAE |0 # FULLWIDTH QUOTATION MARK
 <UFF0D> \x81\xAF |0 # FULLWIDTH HYPHEN-MINUS
 <U007E> \x81\xB0 |0 # TILDE
+<UFF5E> \x81\xB0 |1 # FULLWIDTH TILDE
 <U3033> \x81\xB1 |0 # VERTICAL KANA REPEAT MARK UPPER HALF
 <U3034> \x81\xB2 |0 # VERTICAL KANA REPEAT WITH VOICED SOUND MARK UPPER HALF
 <U3035> \x81\xB3 |0 # VERTICAL KANA REPEAT MARK LOWER HALF
