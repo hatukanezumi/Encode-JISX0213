@@ -300,7 +300,7 @@ About "shift encoding" see L<Encode::ShiftJIS2004>.
 
 =back
 
-Additionally, for older revision, JIS X 0213:2000:
+Additionally, it provides encodings for older revision, JIS X 0213:2000:
 
   Canonical         Alias                         Description
   --------------------------------------------------------------
@@ -315,9 +315,9 @@ and for transition from legacy standards:
 
   Canonical         Alias                         Description
   --------------------------------------------------------------
-  x-iso2022jp2004-compatible                     See note.
+  x-iso2022jp2004-compatible                      See note.
                     qr/\biso-?2022-?jp-?2004-?compatible$/i
-  x-iso2022jp2004-strict                         See note.
+  x-iso2022jp2004-strict                          See note.
                     qr/\biso-?2022-?jp-?2004-?strict$/i
   --------------------------------------------------------------
 
@@ -325,8 +325,9 @@ and for transition from legacy standards:
 
 To find out how to use this module in detail, see L<Encode>.
 
-=head2 Note on Variants
+=head2 Notes on Compatibility
 
+To encode Unicode string to byte string,
 C<x-iso2022jp2004-strict> uses JIS X 0208 as much as possible,
 strictly conforming to JIS X 0213:2004 Annex 2.
 It is compatible to other encodings.
@@ -336,10 +337,29 @@ co-existing on JIS X 0208 and JIS X 0213 plane 1.
 It is I<not> compatible to other encodings;
 it had never been registered by any standards bodies.
 
-However, to decode byte strings, encodings in the tables above
+However, to decode byte string to Unicode string,
+encodings in the tables above
 accept arbitrary sequences of both JIS X 0208 and JIS X 0213.
 Exception is C<x-iso2022jp2004-strict>:
 It accepts only allowed JIS X 0208 sequences.
+
+C<euc-jis-2004> and C<euc-jisx0213> contains JIS X 0213 plane 2 along with
+JIS X 0212 in G3.
+By this non-standard extension, they have forward compatibility with
+EUC-JP (AJEC) in case of decoding.
+
+=head2 Comparison with Other Modules
+
+L<Encode::JIS2K> provides C<euc-jisx0213>, C<iso-2022-jp-3> and
+C<shift_jisx0213> encodings.
+C<euc-jp> in L<Encode::JP> 1.64 or later can decode C<euc-jisx0213>
+sequences.
+They support earlier revision of standard, and lack function to encode
+sequences with multiple Unicode characters such as
+katakana with semi-voiced sound mark.
+
+L<ShiftJIS::X0213::MapUTF> provides C<shift_jisx0213> and C<shift_jis-2004>.
+It does not provide interface to contemporary L<Encode> module.
 
 =head1 SEE ALSO
 

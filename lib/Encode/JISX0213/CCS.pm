@@ -214,8 +214,8 @@ This module provides followng coded character sets.
        jis-x-0213-plane1-2000-jis
   229  jis-x-0213-plane2       JIS X 0213:2000/2004 level 4 (plane 2)
 
-   -   jis-x-0208-0213         Common set of JIS X 0208 and JIS X 0213
-       jis-x-0208-0213-ascii
+   -   jis-x-0208-0213         Common set of JIS X 0208 and JIS X 0213,
+       jis-x-0208-0213-ascii   according to JIS X 0213:2004 Annex 2
        jis-x-0208-0213-jis
   ----------------------------------------------------------------
 
