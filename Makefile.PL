@@ -85,7 +85,7 @@ WriteMakefile(
     META_MERGE    => {
         resources     => {
             license       => 'http://dev.perl.org/licenses/',
-            repository    => 'http://hatuka.nezumi.nu/repos/Encode-JISX0213/',
+            repository    => 'https://github.com/hatukanezumi/Encode-JISX0213/',
         },
     },
 

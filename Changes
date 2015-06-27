@@ -1,5 +1,11 @@
 Revision history for Perl extension Encode-JISX0213.
 
+0.04  Sat Jun 27 2015
+
+	* Fix: CPAN RT #105503: "Replacement list is longer than search list"
+	  warning.  See also Perl RT #125493.
+	* Moved source repo to GitHub.
+
 0.03  Web Sep 25 2013
 
 	* t/JISX0213.t: RT tests had always succeeded.

@@ -178,9 +178,23 @@ sub decode {
     }
     my $utf8 = $self->{encoding}->decode($str, $chk);
     if ($self->{alt} eq 'ascii') {
-	$utf8 =~ tr/\x21-\x7E/\x{FF01}-\x{FF5E}/;
+	$utf8 =~ s{($prohibited_ascii)}
+	    {
+		pack 'U', ord($1) + 0xFEE0;
+	    }eg;
     } elsif ($self->{alt} eq 'jis') {
-	$utf8 =~ tr/\x21-\x5B\x{00A5}\x5D-\x7D\x{203E}/\x{FF01}-\x{FF3B}\x{FFE5}\x{FF3D}-\x{FF5D}\x{FFE3}/;
+	$utf8 =~ s{($prohibited_jis)}
+	    {
+		my $chr = ord $1;
+		if ($chr == 0x00A5) {
+		    $chr = 0xFFE5;
+		} elsif ($chr == 0x203E) {
+		    $chr = 0xFFE3;
+		} else {
+		    $chr += 0xFEE0;
+		}
+		pack 'U', $chr;
+	    }eg;
     }
 
     $_[1] = $str unless ref $chk or $chk & $LEAVE_SRC;
@@ -249,7 +263,7 @@ Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2013 Hatuka*nezumi - IKEDA Soji.
+Copyright (C) 2013, 2015 Hatuka*nezumi - IKEDA Soji.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

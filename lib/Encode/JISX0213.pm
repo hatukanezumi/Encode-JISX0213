@@ -6,7 +6,7 @@ package Encode::JISX0213;
 use strict;
 use warnings;
 use base qw(Encode::ISO2022);
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Encode::ISOIRSingle;
 use Encode::JISLegacy;
@@ -377,7 +377,7 @@ Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2013 Hatuka*nezumi - IKEDA Soji.
+Copyright (C) 2013, 2015 Hatuka*nezumi - IKEDA Soji.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
